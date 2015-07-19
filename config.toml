@@ -1,3 +1,13 @@
 baseurl = "http://yomogitaro.github.io/article/"
 languageCode = "ja"
-title = "たなからくさだいふく"
+title = "よもぎさんのへや"
+
+[Params]
+subtitle = "たなからくさだいふく"
+# facebook = "https://facebook.com/foobar"
+twitter = "https://twitter.com/YOMOGItanpop"
+github = "https://github.com/yomogitaro"
+profile = "https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80"
+copyright = "Written by YOMOGITARO"
+# analytics = "UA-XXXXXXXX-X"
+document_root="/article"

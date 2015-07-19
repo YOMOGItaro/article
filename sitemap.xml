@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://localhost:1313/article/</loc>
+    <loc>http://yomogitaro.github.io/article/</loc>
     <lastmod>2015-07-19T17:59:50+09:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://localhost:1313/article/post/first/</loc>
+    <loc>http://yomogitaro.github.io/article/post/first/</loc>
     <lastmod>2015-07-19T17:59:50+09:00</lastmod>
   </url>
   

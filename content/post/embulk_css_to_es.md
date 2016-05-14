@@ -1,6 +1,6 @@
 +++
 date = "2015-07-20T22:53:57+09:00"
-draft = true
+draft = false
 title = "embulk で csv を elasticsearch に移したい"
 
 +++

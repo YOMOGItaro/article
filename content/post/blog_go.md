@@ -1,6 +1,6 @@
 +++
 date = "2015-07-20T22:16:50+09:00"
-draft = true
+draft = false
 title = "ブログ始めるときに困ったこと"
 
 +++
@@ -13,8 +13,10 @@ title = "ブログ始めるときに困ったこと"
 * github pages
 
 github pages は下記の２通りの方法があるようだった。
+
 * username.github.io という名前のリポジトリを作る
 * 任意のリポジトリに gh-pages というブランチを作る
+
 後者を利用することにした。
 master ブランチにブログのソースを置いて,
 ビルドした結果を公開ブランチにするほうが良さそうだと思った。
@@ -24,8 +26,8 @@ public ディレクトリを gh-pages にした。
 
 主に下記のサイトを参考にした。
 
-http://gohugo.io/overview/introduction/
-https://help.github.com/articles/user-organization-and-project-pages/#project-pages
+* http://gohugo.io/overview/introduction/
+* https://help.github.com/articles/user-organization-and-project-pages/#project-pages
 
 # 構築中に詰まったところ #
 
@@ -37,11 +39,12 @@ $ go
 zsh: no such file or directory: {{go のパス}}/go
 ```
 下記を見なおしたが問題が無かった。
+
 * PATH 設定
 * GOROOT 設定
 * GOPATH 設定
 
-入れていたバイナリが間違っていたことがわかり、
+入れていた go のバイナリが間違っていたことがわかり、
 入れなおしたらうまく動いた。
 64bit が必要だが Linux 32-bit を入れてしまっていた。
 恥ずかしいミスだった。

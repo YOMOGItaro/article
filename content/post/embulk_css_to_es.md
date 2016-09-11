@@ -23,7 +23,7 @@ embulk を利用すればできそうなので試してみた。
 ```
 % docker inspect --format '{{ .NetworkSettings.IPAddress }}' es1
 % curl 'http://172.17.0.4:9200/_stats'
-{"_shards":{"total":0,"successful":0,"failed":0},"_all":{"primaries":{},"total":{}},"indices":{}}% 
+{"_shards":{"total":0,"successful":0,"failed":0},"_all":{"primaries":{},"total":{}},"indices":{}}%
 ```
 * ドキュメントを UI から確認するために kibana も用意
 ```

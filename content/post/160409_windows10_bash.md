@@ -1,6 +1,6 @@
 +++
 date = "2016-04-09T19:14:33+09:00"
-draft = true
+draft = false
 title = "Widows10 の bash を試してみる"
 
 +++

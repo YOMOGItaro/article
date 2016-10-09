@@ -6,7 +6,7 @@
   
   <meta charset="UTF-8">
   <title>
-    ブログはじめました | よもぎさんのへや
+    apt-get update できなくなった | よもぎさんのへや
   </title>
 
 
@@ -14,7 +14,7 @@
   <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
 
   
-  <link rel="canonical" href="http://yomogitaro.github.io/article/post/first/"/>
+  <link rel="canonical" href="http://yomogitaro.github.io/article/post/151115_ubuntu/"/>
 
   
   <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/sanitize.css">
@@ -60,14 +60,31 @@
   
   <main id="single" role="main">
     <div class="article-header">
-      <h1>ブログはじめました</h1>
+      <h1>apt-get update できなくなった</h1>
       <div class="meta">
-        Jul 19, 2015 &nbsp;
+        Nov 15, 2015 &nbsp;
         
       </div>
     </div>
     <article>
-      <p>ブログはじめました!</p>
+      <p>apt-get update したらなんかエラーが出てきた。</p>
+
+<pre><code>W: Failed to fetch http://jp.archive.ubuntu.com/ubuntu/dists/vivid-updates/main/binary-amd64/Packages  Hash Sum mismatch
+
+W: Failed to fetch http://jp.archive.ubuntu.com/ubuntu/dists/vivid-updates/main/binary-i386/Packages  Hash Sum mismatch
+
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+</code></pre>
+
+<p>パッケージの状態を保存したファイルを削除</p>
+
+<pre><code>sudo mv /var/lib/apt/lists /tmp/lists.back
+sudo apt-get autoclean
+sudo apt-get clean
+sudo apt-get update
+</code></pre>
+
+<p>治った</p>
 
       
       
@@ -80,10 +97,10 @@
   
   <nav class="pagination-single">
     
-      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/2016-07-03_154326/" rel="prev"></a></span>
+      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/embulk_css_to_es/" rel="prev">embulk で csv を elasticsearch に移したい</a></span>
     
     
-      <span class="next"><a href="http://yomogitaro.github.io/article/post/blog_go/" rel="next">ブログ始めるときに困ったこと</a> &rarr;</span>
+      <span class="next"><a href="http://yomogitaro.github.io/article/post/160409_windows10_bash/" rel="next">Widows10 の bash を試してみる</a> &rarr;</span>
     
   </nav>
 

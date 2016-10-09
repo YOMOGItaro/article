@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+  
+  <meta charset="UTF-8">
+  <title>
+    ブログ始めるときに困ったこと | よもぎさんのへや
+  </title>
+
+
+  
+  <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yomogitaro.github.io/article/post/blog_go/"/>
+
+  
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/sanitize.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/responsive.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/highlight_monokai.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/theme.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/custom.css">
+  
+  
+  <link href="http://yomogitaro.github.io/article/index.xml" rel="alternate" type="application/rss+xml" title="よもぎさんのへや" />
+  <link href="http://yomogitaro.github.io/article/index.xml" rel="feed" type="application/rss+xml" title="よもぎさんのへや" />
+
+  
+  
+
+
+</head>
+
+
+
+<body>
+<div class="container">
+
+  
+  <header role="banner">
+    <div class="row gutters">
+      <div id="site-title" class="col span_6">
+        <h1><a href="http://yomogitaro.github.io/article/">よもぎさんのへや</a></h1>
+        <h2>たなからくさだいふく</h2>
+      </div>
+      <div id="social" class="col span_6">
+        <ul>
+          <li><a href="https://twitter.com/YOMOGItanpop" target="_blank">Twitter</a></li>
+          
+          <li><a href="https://github.com/yomogitaro" target="_blank">GitHub</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </header>
+
+
+  
+  <main id="single" role="main">
+    <div class="article-header">
+      <h1>ブログ始めるときに困ったこと</h1>
+      <div class="meta">
+        Jul 20, 2015 &nbsp;
+        
+      </div>
+    </div>
+    <article>
+      
+
+<h1 id="どういうふうにブログを作ったか">どういうふうにブログを作ったか</h1>
+
+<p>この blog は下記のものでできている。</p>
+
+<ul>
+<li>hugo</li>
+<li>github pages</li>
+</ul>
+
+<p>github pages は下記の２通りの方法があるようだった。</p>
+
+<ul>
+<li>username.github.io という名前のリポジトリを作る</li>
+<li>任意のリポジトリに gh-pages というブランチを作る</li>
+</ul>
+
+<p>後者を利用することにした。
+master ブランチにブログのソースを置いて,
+ビルドした結果を公開ブランチにするほうが良さそうだと思った。</p>
+
+<p>hugo の最上部のブランチを master,
+public ディレクトリを gh-pages にした。</p>
+
+<p>主に下記のサイトを参考にした。</p>
+
+<ul>
+<li><a href="http://gohugo.io/overview/introduction/">http://gohugo.io/overview/introduction/</a></li>
+<li><a href="https://help.github.com/articles/user-organization-and-project-pages/#project-pages">https://help.github.com/articles/user-organization-and-project-pages/#project-pages</a></li>
+</ul>
+
+<h1 id="構築中に詰まったところ">構築中に詰まったところ</h1>
+
+<h2 id="go-インストール後パスを通したのに-go-がないと言われる">go インストール後パスを通したのに go がないと言われる</h2>
+
+<p>go を実行したら下記のようなメッセージが出てきた。</p>
+
+<pre><code class="language-zsh">$ go
+zsh: no such file or directory: {{go のパス}}/go
+</code></pre>
+
+<p>下記を見なおしたが問題が無かった。</p>
+
+<ul>
+<li>PATH 設定</li>
+<li>GOROOT 設定</li>
+<li>GOPATH 設定</li>
+</ul>
+
+<p>入れていた go のバイナリが間違っていたことがわかり、
+入れなおしたらうまく動いた。
+64bit が必要だが Linux 32-bit を入れてしまっていた。
+恥ずかしいミスだった。</p>
+
+<h2 id="hugo-テーマがうまく当たらない">hugo テーマがうまく当たらない</h2>
+
+<p>hugo のテーマがうまく当たらなかった。
+サイトのパスのトップに css や js がないとうまく動かなかった。
+パスを設定できるようにして当たるようにした。</p>
+
+      
+      
+      
+    </article>
+    
+
+
+  </main>
+  
+  <nav class="pagination-single">
+    
+      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/first/" rel="prev">ブログはじめました</a></span>
+    
+    
+      <span class="next"><a href="http://yomogitaro.github.io/article/post/embulk_css_to_es/" rel="next">embulk で csv を elasticsearch に移したい</a> &rarr;</span>
+    
+  </nav>
+
+
+  
+  <footer role="contentinfo">
+    <div style="text-align:center;">
+      <img src="https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80" width="64" height="64"><br>
+      Written by YOMOGITARO
+    </div>
+  </footer>
+
+
+</div>
+
+<script src="http://yomogitaro.github.io/article/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+</body>
+</html>
+

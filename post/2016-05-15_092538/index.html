@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+  
+  <meta charset="UTF-8">
+  <title>
+    コミットしわすれている git リポジトリを通知する | よもぎさんのへや
+  </title>
+
+
+  
+  <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yomogitaro.github.io/article/post/2016-05-15_092538/"/>
+
+  
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/sanitize.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/responsive.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/highlight_monokai.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/theme.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/custom.css">
+  
+  
+  <link href="http://yomogitaro.github.io/article/index.xml" rel="alternate" type="application/rss+xml" title="よもぎさんのへや" />
+  <link href="http://yomogitaro.github.io/article/index.xml" rel="feed" type="application/rss+xml" title="よもぎさんのへや" />
+
+  
+  
+
+
+</head>
+
+
+
+<body>
+<div class="container">
+
+  
+  <header role="banner">
+    <div class="row gutters">
+      <div id="site-title" class="col span_6">
+        <h1><a href="http://yomogitaro.github.io/article/">よもぎさんのへや</a></h1>
+        <h2>たなからくさだいふく</h2>
+      </div>
+      <div id="social" class="col span_6">
+        <ul>
+          <li><a href="https://twitter.com/YOMOGItanpop" target="_blank">Twitter</a></li>
+          
+          <li><a href="https://github.com/yomogitaro" target="_blank">GitHub</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </header>
+
+
+  
+  <main id="single" role="main">
+    <div class="article-header">
+      <h1>コミットしわすれている git リポジトリを通知する</h1>
+      <div class="meta">
+        May 15, 2016 &nbsp;
+        
+      </div>
+    </div>
+    <article>
+      
+
+<h1 id="コミットしわすれている-git-リポジトリをきれいにした">コミットしわすれている git リポジトリをきれいにした</h1>
+
+<p>そもそもどんなリポジトリを作っていたかも謎になっていたので、探すところからやった。
+cron で実行して通知するために、<code>DBUS_SESSION_BUS_ADDRESS</code>を探すところが苦労した。</p>
+
+<pre><code class="language-zsh">#!/usr/bin/env zsh
+
+SESSION_MANAGER=xfce4-session
+SCRIPT_NAME=&quot;yomogi-git-commit-reminder&quot;
+NOTIFY_LIFE_TIME=5000
+
+function LIST_GIT_DIRS() {
+    find $HOME -xdev -type d -name .git 2&gt;/dev/null
+}
+
+
+function create_remind_reports() {
+    LINE=''
+    LIST_GIT_DIRS | while read git_dir
+    do
+        CHANGED_LINES=`git --git-dir=&quot;$git_dir&quot; --work-tree=&quot;$git_dir/..&quot; status --porcelain | wc -l`
+
+        if [ $CHANGED_LINES -gt 0 ]
+        then
+            LINE=$LINE&quot; `printf &quot;%05d&quot; $CHANGED_LINES` ${git_dir%/*} \n&quot;
+        fi
+    done
+
+    echo $LINE;
+}
+
+
+function output_report() {
+    if [ &quot;$VERBOSE&quot; = &quot;TRUE&quot; ]
+    then
+        echo $REPORTS
+    fi
+
+    if [ &quot;$NOTIFY&quot; = &quot;TRUE&quot; ]
+    then
+        PID=$(pgrep xfce4-session)
+        dbus=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
+        export DBUS_SESSION_BUS_ADDRESS=$dbus
+
+        /usr/bin/notify-send --urgency=low --expire-time=$NOTIFY_LIFE_TIME --category=git \
+                    --icon=$HOME/var/image/Git-Icon-White.png \
+                    'not commited git repos' $REPORTS
+    fi;
+}
+
+
+###
+# main section
+VERBOSE=&quot;TRUE&quot;
+while getopts nq OPT
+do
+    case $OPT in
+        &quot;n&quot; ) NOTIFY=&quot;TRUE&quot; ;;
+        &quot;q&quot; ) VERBOSE=&quot;FALSE&quot; ;;
+          * ) echo &quot;unexpected arg $OPT&quot;
+               exit 1;;
+    esac
+done
+
+REPORTS=`create_remind_reports`
+output_report &quot;$REPORTS&quot;
+</code></pre>
+
+<p>こんな感じで出てくる。</p>
+
+<pre><code>yomogi-git-commit-reminder.sh -n
+ 00003 /hoge/fuga
+ 00013 /piyo
+</code></pre>
+
+<p><code>-n</code> をつけると通知が出るようにして crontab に追加した。</p>
+
+<h1 id="emacs-で-python-を書く設定をする">emacs で python を書く設定をする</h1>
+
+<p><a href="https://www.emacswiki.org/emacs/PythonProgrammingInEmacs">https://www.emacswiki.org/emacs/PythonProgrammingInEmacs</a> を参考に書く。</p>
+
+      
+      
+      
+    </article>
+    
+
+
+  </main>
+  
+  <nav class="pagination-single">
+    
+      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/160409_windows10_bash/" rel="prev">Widows10 の bash を試してみる</a></span>
+    
+    
+      <span class="next"><a href="http://yomogitaro.github.io/article/post/2016-05-21_105348/" rel="next">ひとに画面を見せて作業するときのあれこれ</a> &rarr;</span>
+    
+  </nav>
+
+
+  
+  <footer role="contentinfo">
+    <div style="text-align:center;">
+      <img src="https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80" width="64" height="64"><br>
+      Written by YOMOGITARO
+    </div>
+  </footer>
+
+
+</div>
+
+<script src="http://yomogitaro.github.io/article/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+</body>
+</html>
+

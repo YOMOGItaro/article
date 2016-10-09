@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+
+  
+  <meta charset="UTF-8">
+  <title>
+    embulk で csv を elasticsearch に移したい | よもぎさんのへや
+  </title>
+
+
+  
+  <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
+
+  
+  <link rel="canonical" href="http://yomogitaro.github.io/article/post/embulk_css_to_es/"/>
+
+  
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/sanitize.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/responsive.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/highlight_monokai.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/theme.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/custom.css">
+  
+  
+  <link href="http://yomogitaro.github.io/article/index.xml" rel="alternate" type="application/rss+xml" title="よもぎさんのへや" />
+  <link href="http://yomogitaro.github.io/article/index.xml" rel="feed" type="application/rss+xml" title="よもぎさんのへや" />
+
+  
+  
+
+
+</head>
+
+
+
+<body>
+<div class="container">
+
+  
+  <header role="banner">
+    <div class="row gutters">
+      <div id="site-title" class="col span_6">
+        <h1><a href="http://yomogitaro.github.io/article/">よもぎさんのへや</a></h1>
+        <h2>たなからくさだいふく</h2>
+      </div>
+      <div id="social" class="col span_6">
+        <ul>
+          <li><a href="https://twitter.com/YOMOGItanpop" target="_blank">Twitter</a></li>
+          
+          <li><a href="https://github.com/yomogitaro" target="_blank">GitHub</a></li>
+          
+        </ul>
+      </div>
+    </div>
+  </header>
+
+
+  
+  <main id="single" role="main">
+    <div class="article-header">
+      <h1>embulk で csv を elasticsearch に移したい</h1>
+      <div class="meta">
+        Jul 20, 2015 &nbsp;
+        
+      </div>
+    </div>
+    <article>
+      
+
+<h1 id="やりたいこと">やりたいこと</h1>
+
+<ul>
+<li>csv のファイルの内容を elasticsearch に移行したい</li>
+</ul>
+
+<h1 id="試した方法">試した方法</h1>
+
+<p>embulk を利用すればできそうなので試してみた。</p>
+
+<h2 id="テスト用-elasticsearch-の準備">テスト用 elasticsearch の準備　</h2>
+
+<ul>
+<li>elasticsearch を入れる
+<code>
+% docker run -d --name es1 elasticsearch
+</code></li>
+<li>IP を確認して動いているか確認
+<code>
+% docker inspect --format '{{ .NetworkSettings.IPAddress }}' es1
+% curl 'http://172.17.0.4:9200/_stats'
+{&quot;_shards&quot;:{&quot;total&quot;:0,&quot;successful&quot;:0,&quot;failed&quot;:0},&quot;_all&quot;:{&quot;primaries&quot;:{},&quot;total&quot;:{}},&quot;indices&quot;:{}}%
+</code></li>
+<li>ドキュメントを UI から確認するために kibana も用意
+<code>
+% docker run --link es1:elasticsearch -d --name kibana01 kibana
+% docker inspect --format '{{ .NetworkSettings.IPAddress }}' kibana01
+</code></li>
+<li><a href="http://172.17.0.6:5601">http://172.17.0.6:5601</a> 動いているか見てみる</li>
+</ul>
+
+<h2 id="embulk-のインストール">embulk のインストール</h2>
+
+<ul>
+<li>java が必要なので入れる
+<code>
+% sudo apt-get install openjdk-8-jdk 
+</code></li>
+
+<li><p>ここに書いてあるとおりに入れてみる
+<a href="https://github.com/embulk/embulk#linux--mac--bsd">https://github.com/embulk/embulk#linux--mac--bsd</a></p></li>
+
+<li><p>サンプルを動かしてみる</p>
+
+<pre><code>% embulk example ./try1
+% embulk guess ./try1/example.yml -o config.yml
+% embulk preview config.yml
+% embulk run config.yml
+</code></pre></li>
+</ul>
+
+<h2 id="embulk-elasticsearch-プラグインのインストール">embulk elasticsearch プラグインのインストール</h2>
+
+<ul>
+<li>elasticsearch の output-plugin をインストール
+<code>
+% embulk gem install embulk-output-elasticsearch
+</code></li>
+<li>example を下記のように編集
+```
+in:
+type: file
+path<em>prefix: &ldquo;/tmp/try1/csv/sample</em>&ldquo;
+out:
+type: elasticsearch
+nodes:
+
+<ul>
+<li>{host: 172.17.0.4, port: 9300}
+index: embulk
+index_type: embulk
+```</li>
+</ul></li>
+<li>config 再生成して実行
+<code>
+% embulk guess ./try1/example.yml -o config.yml
+% embulk run config.yml
+</code></li>
+<li>うまくいっているか確認
+<code>
+curl 'http://172.17.0.4:9200/embulk/_search' | jq .
+</code></li>
+</ul>
+
+      
+      
+      
+    </article>
+    
+
+
+  </main>
+  
+  <nav class="pagination-single">
+    
+      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/blog_go/" rel="prev">ブログ始めるときに困ったこと</a></span>
+    
+    
+      <span class="next"><a href="http://yomogitaro.github.io/article/post/151115_ubuntu/" rel="next">apt-get update できなくなった</a> &rarr;</span>
+    
+  </nav>
+
+
+  
+  <footer role="contentinfo">
+    <div style="text-align:center;">
+      <img src="https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80" width="64" height="64"><br>
+      Written by YOMOGITARO
+    </div>
+  </footer>
+
+
+</div>
+
+<script src="http://yomogitaro.github.io/article/js/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+</body>
+</html>
+

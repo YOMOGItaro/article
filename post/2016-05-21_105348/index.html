@@ -6,7 +6,7 @@
   
   <meta charset="UTF-8">
   <title>
-    ブログはじめました | よもぎさんのへや
+    ひとに画面を見せて作業するときのあれこれ | よもぎさんのへや
   </title>
 
 
@@ -14,7 +14,7 @@
   <meta name="viewport" content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1">
 
   
-  <link rel="canonical" href="http://yomogitaro.github.io/article/post/first/"/>
+  <link rel="canonical" href="http://yomogitaro.github.io/article/post/2016-05-21_105348/"/>
 
   
   <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/sanitize.css">
@@ -60,14 +60,57 @@
   
   <main id="single" role="main">
     <div class="article-header">
-      <h1>ブログはじめました</h1>
+      <h1>ひとに画面を見せて作業するときのあれこれ</h1>
       <div class="meta">
-        Jul 19, 2015 &nbsp;
+        May 21, 2016 &nbsp;
         
       </div>
     </div>
     <article>
-      <p>ブログはじめました!</p>
+      
+
+<h1 id="デモ動画を撮りたい">デモ動画を撮りたい</h1>
+
+<h2 id="スクリーンキャストソフト">スクリーンキャストソフト</h2>
+
+<p>kazam というのを使う</p>
+
+<h2 id="キーキャストソフト">キーキャストソフト</h2>
+
+<p><a href="https://github.com/wavexx/screenkey">screen key</a> というのを使う。
+apt だと 0.2 が入ってしまうので、  github から入れる。 0.9 を入れた。</p>
+
+<p>コンフィグファイルは、 <code>~/.config/screencast.json</code>。
+注意する。</p>
+
+<pre><code>{
+  &quot;font_color&quot;: &quot;white&quot;,
+  &quot;persist&quot;: true,
+  &quot;timeout&quot;: 1.0,
+  &quot;multiline&quot;: false,
+  &quot;geometry&quot;: null,
+  &quot;bak_mode&quot;: &quot;baked&quot;,
+  &quot;recent_thr&quot;: 0.1,
+  &quot;font_size&quot;: &quot;small&quot;,
+  &quot;ignore&quot;: [],
+  &quot;mods_mode&quot;: &quot;normal&quot;,
+  &quot;vis_shift&quot;: false,
+  &quot;key_mode&quot;: &quot;composed&quot;,
+  &quot;position&quot;: &quot;bottom&quot;,
+  &quot;vis_space&quot;: true,
+  &quot;bg_color&quot;: &quot;black&quot;,
+  &quot;no_systray&quot;: false,
+  &quot;screen&quot;: 0,
+  &quot;compr_cnt&quot;: 3,
+  &quot;font_desc&quot;: &quot;\u307f\u304b\u3061\u3083\u3093-P 0&quot;,
+  &quot;mods_only&quot;: false,
+  &quot;opacity&quot;: 0.1
+}
+</code></pre>
+
+<p>こんな感じにした。</p>
+
+<p>左シフトと右シフトを同時に押すと、表示、非表示を切り替えられるのが便利。</p>
 
       
       
@@ -80,10 +123,10 @@
   
   <nav class="pagination-single">
     
-      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/2016-07-03_154326/" rel="prev"></a></span>
+      <span class="previous">&larr; <a href="http://yomogitaro.github.io/article/post/2016-05-15_092538/" rel="prev">コミットしわすれている git リポジトリを通知する</a></span>
     
     
-      <span class="next"><a href="http://yomogitaro.github.io/article/post/blog_go/" rel="next">ブログ始めるときに困ったこと</a> &rarr;</span>
+      <span class="next"><a href="http://yomogitaro.github.io/article/post/2016-07-03_164438/" rel="next">tmuxinator を使ってみた</a> &rarr;</span>
     
   </nav>
 

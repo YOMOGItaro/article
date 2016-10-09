@@ -2,21 +2,882 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>よもぎさんのへや</title>
-    <link>http://localhost:1313/article/</link>
+    <link>http://yomogitaro.github.io/article/index.xml</link>
     <description>Recent content on よもぎさんのへや</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <lastBuildDate>Sun, 19 Jul 2015 17:59:50 +0900</lastBuildDate>
-    <atom:link href="http://localhost:1313/article/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>Written by YOMOGITARO</copyright>
+    <lastBuildDate>Sun, 10 Jul 2016 11:03:33 +0900</lastBuildDate>
+    <atom:link href="http://yomogitaro.github.io/article/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>elasticsearch 5.0.0-alpha4 &#43; IPv6 &#43; Packetbeats で遊びたい</title>
+      <link>http://yomogitaro.github.io/article/post/2016-07-10_110330/</link>
+      <pubDate>Sun, 10 Jul 2016 11:03:33 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2016-07-10_110330/</guid>
+      <description>
+
+&lt;p&gt;elasticsearch 5.0.0-alpha4 をみると datatype に IPv6 を含む IP 型ができている
+&lt;a href=&#34;https://www.elastic.co/guide/en/elasticsearch/reference/master/ip.html&#34;&gt;https://www.elastic.co/guide/en/elasticsearch/reference/master/ip.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;An ip field can index/store either IPv4 or IPv6 addresses.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;試してみたい。
+IPv6 もよく知らないので、ちょっと触ってみたい。せっかくなので Packetbeats も試してみたい。&lt;/p&gt;
+
+&lt;p&gt;やってみたら、 IPv6 を使うときは ip 型の stored を有効にしたほうが良さそうということがわかった。&lt;/p&gt;
+
+&lt;h2 id=&#34;elasticsearch-kibana&#34;&gt;Elasticsearch + kibana&lt;/h2&gt;
+
+&lt;p&gt;とりあえず環境をつくる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% docker pull elasticsearch:5.0.0-alpha4
+% docker run -d --name es2 elasticsearch:5.0.0-alpha4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;メモリ確保できないといわれた&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{&amp;quot;log&amp;quot;:&amp;quot;Exception in thread \&amp;quot;main\&amp;quot; java.lang.RuntimeException: bootstrap checks failed\n&amp;quot;,&amp;quot;stream&amp;quot;:&amp;quot;stderr&amp;quot;,&amp;quot;time&amp;quot;:&amp;quot;2016-07-10T06:56:11.405356902Z&amp;quot;}
+{&amp;quot;log&amp;quot;:&amp;quot;initial heap size [268435456] not equal to maximum heap size [2147483648]; this can cause resize pauses and prevents mlockall from locking the entire heap\n&amp;quot;,&amp;quot;stream&amp;quot;:&amp;quot;stderr&amp;quot;,&amp;quot;time&amp;quot;:&amp;quot;2016-07-10T06:56:11.405443037Z&amp;quot;}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://discuss.elastic.co/t/initial-heap-size-not-equal-to-maximum-heap-size/50499&#34;&gt;https://discuss.elastic.co/t/initial-heap-size-not-equal-to-maximum-heap-size/50499&lt;/a&gt; を参考にして
+&lt;code&gt;ES_HEAP_SIZE&lt;/code&gt; を変更しようとしたら、 &lt;code&gt;ES_JAVA_OPTS&lt;/code&gt; を編集してと言われた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% docker run -it --rm -e ES_HEAP_SIZE=&#39;256m&#39;  --name  es03  elasticsearch:5.0.0-alpha4
+Error: encountered environment variables that are no longer supported
+Use jvm.options or ES_JAVA_OPTS to configure the JVM
+ES_HEAP_SIZE=256m: set -Xms256m and -Xmx256m in jvm.options or add &amp;quot;-Xms256m -Xmx256m&amp;quot; to ES_JAVA_OPTS
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;また、おこられた&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% docker run -it --rm -e ES_JAVA_OPTS=&#39;-256m -256m&#39;  --name  es03  elasticsearch:5.0.0-alpha4
+max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;vm.max_map_count&lt;/code&gt; はプロセスが利用可能なメモリマップの最大値らしい。
+少なくとも 262144 にして欲しいそうなので変える。
+sysctl で書き換える。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo sysctl -w vm.max_map_count=262144
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;無事立ち上がった。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;docker run -it --rm -e ES_JAVA_OPTS=&#39;-Xms256m -Xmx256m&#39;  --name  es03  elasticsearch:5.0.0-alpha4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;kibana も新しいのにしてみた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;docker run -it --rm --link es03:elasticsearch --name kibana02 kibana:5.0.0-alpha4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;kibana 開いてみたら自分が見慣れていた色と違う色使いの画面が出てきて戸惑った。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana001.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Upload CSV とか書いてあった。 1GB までの CSV ならアップロードできるみたい。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;気になったので少し脱線してやってみた。
+統計庁から適当な csv 持ってきていれてみた。
+&lt;a href=&#34;http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&amp;amp;cycode=0&#34;&gt;http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&amp;amp;cycode=0&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;先頭行がフィールド名として扱われた。デリミタはタブ、スペース、セミコロン、パイプも指定できる。
+適当に整形した。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana004.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;各フィールドの型は決められるみたいだった。
+事前に時間を表すフィールドは date 型に変換できるように整形したほうが良さそうだった。
+今回は &lt;code&gt;199901&lt;/code&gt; を &lt;code&gt;1999-01&lt;/code&gt; に事前に修正すればよかった。
+インデックス名もここで決められた。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana005.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;無事アップロードできた。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana006.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;飲み物の消費者物価指数推移とかが作れた。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana007.png&#34; alt=&#34;&#34; /&gt;
+どうでも良いことだが、物価指数は基準の月を 100 とした時の、
+比較を表しているものらしかった。&lt;/p&gt;
+
+&lt;h2 id=&#34;packetbeats&#34;&gt;packetbeats&lt;/h2&gt;
+
+&lt;p&gt;まずはダッシュボードの準備。
+&lt;a href=&#34;https://github.com/elastic/beats-dashboards&#34;&gt;https://github.com/elastic/beats-dashboards&lt;/a&gt;
+指定する IP は ES の IP なので注意。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% ./load.sh -url &amp;quot;http://172.17.0.2:9200&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;いくつか kibana のダッシュボードが増える。
+web と db については、詳細に見られそうだった。&lt;/p&gt;
+
+&lt;p&gt;packetbeats そのものをインストールする。ここにしたがってインストールした。
+&lt;a href=&#34;https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation.html&#34;&gt;https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ES にテンプレートを適用した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% curl -XPUT &#39;http://172.17.0.2:9200/_template/packetbeat&#39; -d@packetbeat.template.json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;packetbeat.yml&lt;/code&gt; が必要らしいので書く。インデックス名は packetbeat にしないと、
+多分テンプレートと、ダッシュボードがうまく使えない。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;hosts: [&amp;quot;172.17.0.2:9200&amp;quot;]
+index: &amp;quot;packetbeat&amp;quot;
+template:
+  path: &amp;quot;packetbeat.template.json&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;コンフィグテストして実行した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% sudo packetbeat -configtest -e ./
+% sudo packetbeat
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;es にちゃんと溜まった。&lt;/p&gt;
+
+&lt;h2 id=&#34;es-に残っている結果をみてみた&#34;&gt;ES に残っている結果をみてみた&lt;/h2&gt;
+
+&lt;p&gt;kibana からドキュメントを見たところ、 ip のフィールドの type が string になっていた。
+v1.2 を入れていたが packetbeats 用のテンプレートで特に指定されていないのでそうなっている。
+&lt;a href=&#34;https://github.com/elastic/beats/blob/1.2/packetbeat/etc/packetbeat.template.json&#34;&gt;https://github.com/elastic/beats/blob/1.2/packetbeat/etc/packetbeat.template.json&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;master ブランチをみたら &lt;code&gt;keyword&lt;/code&gt; となっていた。 &lt;code&gt;ip&lt;/code&gt; ではないので、やろうと思っていたことができない。
+&lt;a href=&#34;https://github.com/elastic/beats/blob/master/packetbeat/packetbeat.template.json#L910-L913&#34;&gt;https://github.com/elastic/beats/blob/master/packetbeat/packetbeat.template.json#L910-L913&lt;/a&gt;
+よくよく考えたら現行バージョンの ip 型は IPv6 に対応していないので、この型になっているのは正しい。&lt;/p&gt;
+
+&lt;p&gt;試してみたいので IP が入るところを ip に適当に変換して適用してみた。
+ingest API でも設定できそうだが、 beats で送信するときにうまく設定する方法がわからなかったので、やらなかった。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% curl -XPUT &#39;http://172.17.0.2:9200/_template/packetbeat&#39; -d@packetbeat-iptest.template.json
+% curl -XDELETE &#39;http://172.17.0.2:9200/packetbeat-*&#39;
+% sudo packetbeat
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;ip-型を使うと良い所-ipv4&#34;&gt;ip 型を使うと良い所 IPv4&lt;/h2&gt;
+
+&lt;p&gt;IPv4 では range の検索はできる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;POST packetbeat-*/_search
+{
+  &amp;quot;query&amp;quot;: {
+    &amp;quot;range&amp;quot;: {
+      &amp;quot;client_ip&amp;quot;: {
+        &amp;quot;from&amp;quot;: &amp;quot;127.0.0.1&amp;quot;,
+        &amp;quot;to&amp;quot;: &amp;quot;127.255.255.255&amp;quot;
+      }
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;IPv4 で CIDR の検索もできる(v2.2.0 以降らしい)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;POST packetbeat-*/_search
+{
+  &amp;quot;query&amp;quot;: {
+    &amp;quot;term&amp;quot;: {
+      &amp;quot;client_ip&amp;quot;: &amp;quot;127.0.0.0/8&amp;quot;
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;ipv6-を入れた時のこと&#34;&gt;IPv6 を入れた時のこと&lt;/h2&gt;
+
+&lt;p&gt;packetbeats からやるのが面倒になったので試しにデータを入れてみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -XPOST http://172.17.0.2:9200/iptest -d &#39;{
+    &amp;quot;mappings&amp;quot; : {
+        &amp;quot;testtype&amp;quot; : {
+            &amp;quot;properties&amp;quot; : {
+                &amp;quot;ip&amp;quot; : { &amp;quot;type&amp;quot; : &amp;quot;ip&amp;quot; }
+            }
+        }
+    }
+}&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;入れた順番でソートしたいので作成時間のフィールドを追加。 &lt;code&gt;_datetime&lt;/code&gt; は5系ではなくなって、
+ingest API で設定するようになったらしい。
+&lt;a href=&#34;https://www.elastic.co/guide/en/elasticsearch/reference/master/accessing-data-in-pipelines.html#accessing-ingest-metadata&#34;&gt;https://www.elastic.co/guide/en/elasticsearch/reference/master/accessing-data-in-pipelines.html#accessing-ingest-metadata&lt;/a&gt;
+現在のところ mapping とかで pipeline は指定できないので、ドキュメント作成時に指定するか、 reindex しないといけないらしい。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -XPUT &#39;http://172.17.0.2:9200/_ingest/pipeline/add-received-pipeline&#39; -d&#39;{
+  &amp;quot;description&amp;quot;: &amp;quot;add received time&amp;quot;,
+  &amp;quot;processors&amp;quot;: [
+    {
+      &amp;quot;set&amp;quot;: {
+        &amp;quot;field&amp;quot;: &amp;quot;received&amp;quot;,
+        &amp;quot;value&amp;quot;: &amp;quot;{{ _ingest.timestamp }}&amp;quot;
+      }
+    }
+  ]
+}&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;入れるデータは &lt;a href=&#34;http://www.ietf.org/rfc/rfc5952.txt&#34;&gt;http://www.ietf.org/rfc/rfc5952.txt&lt;/a&gt; を参考にした。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd::1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:0:1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:0:0:0::1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:0:0::1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:0::1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8::1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8::aaaa:0:0:1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:0:0:aaaa::1&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:aaaa&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AAAA&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AaAa&amp;quot; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &amp;quot;ip&amp;quot; : &amp;quot;::0&amp;quot; }&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;中に入っているデータは、同じ IP でも入れた時と同じ形式で入っていた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% curl -s -XPOST http://172.17.0.2:9200/iptest/_search -d&#39;{ &amp;quot;size&amp;quot;: 100, &amp;quot;sort&amp;quot;: &amp;quot;received&amp;quot; }&#39; | jq &amp;quot;.hits.hits[]._source.ip&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd::1&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:0:1&amp;quot;
+&amp;quot;2001:db8:0:0:0::1&amp;quot;
+&amp;quot;2001:db8:0:0::1&amp;quot;
+&amp;quot;2001:db8:0::1&amp;quot;
+&amp;quot;2001:db8::1&amp;quot;
+&amp;quot;2001:db8::aaaa:0:0:1&amp;quot;
+&amp;quot;2001:db8:0:0:aaaa::1&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:aaaa&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AAAA&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AaAa&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検索してみた。表記方法が異なってもちゃんと検索されていた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -s -XPOST http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &amp;quot;query&amp;quot;: {
+    &amp;quot;term&amp;quot;: {
+      &amp;quot;ip&amp;quot;: &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+    }
+  }
+}
+&#39; | jq &amp;quot;.hits.hits[]._source.ip&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&amp;quot;
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;中に入っている情報は 128bit なはずなので調べる。
+(補足)5 系から field -&amp;gt; stored_field, fielddata_field -&amp;gt; docvalue_field に変更されているようだが、
+alpha4 の時点では、&lt;a href=&#34;https://github.com/elastic/elasticsearch/commit/eb1e231a635a124f445364e4baabaf1c297399ff&#34;&gt;一度元に戻されていたた&lt;/a&gt;め、 fielddata_fields を指定しないと動かなかった。5系リリース時点では、 docvalue_field 指定が正しくなっていそう。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% curl -s -XGET http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &amp;quot;query&amp;quot;: {
+    &amp;quot;term&amp;quot;: {
+      &amp;quot;ip&amp;quot;: &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+    }
+  },
+  &amp;quot;fielddata_fields&amp;quot; : [&amp;quot;ip&amp;quot;]
+}
+&#39; | jq &amp;quot;.hits.hits[] | .fields.ip[0], ._source.ip&amp;quot; | paste -d, - -
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;フィールドとして変換された結果は同じものとして、入っているみたいだった。
+フィールドのほうは読めない。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot; \u0001\r¸ªª»»̌ݝ\u0001&amp;quot;,&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&amp;quot;
+&amp;quot; \u0001\r¸ªª»»̌ݝ\u0001&amp;quot;,&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;
+&amp;quot; \u0001\r¸ªª»»̌ݝ\u0001&amp;quot;,&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&amp;quot;
+&amp;quot; \u0001\r¸ªª»»̌ݝ\u0001&amp;quot;,&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;入っている内容はよくわからないし、バイト数も多い。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% curl -s -XGET http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &amp;quot;query&amp;quot;: {
+    &amp;quot;term&amp;quot;: {
+      &amp;quot;ip&amp;quot;: &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+    }
+  },
+  &amp;quot;fielddata_fields&amp;quot; : [&amp;quot;ip&amp;quot;]
+}
+&#39; | jq -r &amp;quot;.hits.hits[0] | .fields.ip[0]&amp;quot; | hexdump -C -s 1
+00000001  01 0d c2 b8 c2 aa c2 aa  c2 bb c2 bb cc 8c dd 9d  |................|
+00000011  ee ae 80 01 0a                                    |.....|
+00000016
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;いろいろ調べてたら doc_value として持っていたら良さそうだった。
+&lt;a href=&#34;https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/search/DocValueFormat.java#L296&#34;&gt;https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/search/DocValueFormat.java#L296&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;ip を stored にしてみた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -XPOST http://172.17.0.2:9200/iptest -d &#39;{
+    &amp;quot;mappings&amp;quot; : {
+        &amp;quot;testtype&amp;quot; : {
+            &amp;quot;properties&amp;quot; : {
+                &amp;quot;ip&amp;quot; : { &amp;quot;type&amp;quot; : &amp;quot;ip&amp;quot;, &amp;quot;stored&amp;quot;: true }
+            }
+        }
+    }
+}&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;検索してみる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;curl -s -XGET http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &amp;quot;query&amp;quot;: {
+    &amp;quot;term&amp;quot;: {
+      &amp;quot;ip&amp;quot;: &amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&amp;quot;
+    }
+  },
+  &amp;quot;fields&amp;quot; : [&amp;quot;ip&amp;quot;]
+}
+&#39; | jq &amp;quot;.hits.hits[] | .fields.ip[0], ._source.ip&amp;quot; | paste -d, - -
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ちゃんと見える状態で入ってきた。
+stored にすると source を変換した値が入ることがあるようだった。知らなかった。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;,null
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;,null
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;,null
+&amp;quot;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&amp;quot;,null
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;kibana でも統一されたフォーマットで表示されるようになった。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana008.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;感想&#34;&gt;感想&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ip 型を使って、 IPv6 の検索結果のフォーマットを統一したいときは、 stored を true にしたほうが良い。&lt;/li&gt;
+&lt;li&gt;ingests API の  pipeline をデフォルトで通すようにしたいけど、 mapping とかで設定できないのでどう設定すればいいかわからなかった&lt;/li&gt;
+&lt;li&gt;test-kitchen を途中で見かけたけど便利そうだった&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;みたところ&#34;&gt;みたところ&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://docs.oracle.com/javase/jp/6/api/java/net/Inet6Address.html&#34;&gt;https://docs.oracle.com/javase/jp/6/api/java/net/Inet6Address.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/apache/lucene-solr/blob/91fd163112b9a433d3e1f578d5c8a9cfbd9dce2f/lucene/sandbox/src/java/org/apache/lucene/document/InetAddressPoint.java&#34;&gt;https://github.com/apache/lucene-solr/blob/91fd163112b9a433d3e1f578d5c8a9cfbd9dce2f/lucene/sandbox/src/java/org/apache/lucene/document/InetAddressPoint.java&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/index/mapper/ip/IpFieldMapper.java&#34;&gt;https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/index/mapper/ip/IpFieldMapper.java&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>tmuxinator を使ってみた</title>
+      <link>http://yomogitaro.github.io/article/post/2016-07-03_164438/</link>
+      <pubDate>Sun, 03 Jul 2016 16:44:41 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2016-07-03_164438/</guid>
+      <description>
+
+&lt;h1 id=&#34;tmuxinator&#34;&gt;tmuxinator&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo gem install tmuxinator
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;環境変数 &lt;code&gt;EDITOR&lt;/code&gt; &lt;code&gt;SHELL&lt;/code&gt; と tmux のインストールが事前に必要&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;tmuxinator new tmux-window1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;$HOME/.tmuxinator/&lt;/code&gt; 以下にテンプレートファイルが作られる&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;# ~/.tmuxinator/tmux-window1.yml
+
+name: tmux-window1
+root: ~/
+
+# Optional tmux socket
+# socket_name: foo
+
+# Runs before everything. Use it to start daemons etc.
+# pre: sudo /etc/rc.d/mysqld start
+
+# Runs in each window and pane before window/pane specific commands. Useful for setting up interpreter versions.
+# pre_window: rbenv shell 2.0.0-p247
+
+# Pass command line options to tmux. Useful for specifying a different tmux.conf.
+# tmux_options: -f ~/.tmux.mac.conf
+
+# Change the command to call tmux.  This can be used by derivatives/wrappers like byobu.
+# tmux_command: byobu
+
+# Specifies (by name or index) which window will be selected on project startup. If not set, the first window is used.
+# startup_window: logs
+
+# Controls whether the tmux session should be attached to automatically. Defaults to true.
+# attach: false
+
+# Runs after everything. Use it to attach to tmux with custom options etc.
+# post: tmux -CC attach -t tmux-window1
+
+windows:
+  - editor:
+      layout: main-vertical
+      panes:
+        - vim
+        - guard
+  - server: bundle exec rails s
+  - logs: tail -f log/development.log
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code&gt;# ~/.tmuxinator/tmux-window1.yml
+
+name: tmux-window1
+root: ~/
+windows:
+  - server:
+    - ls &amp;lt;%= @args[0] %&amp;gt;
+  - editor:
+      layout: main-vertical
+      panes:
+        - ls
+        - ls
+  - logs: ls
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;レイアウトは、名前に  main が付いているものはひとつだけ大きいペインになるようだった。
+even が付いているものは均等になるようだった。
+tiled はタイル状に配置された。
+ssh や sudo でパスワード認証を利用している時の良い方法は思いつかなかった。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;name: tmux-window1
+root: ~/
+windows:
+  - main:
+      layout: tiled
+      panes:
+        - ls1:
+          - echo 1
+        - ls2:
+          - echo 2
+        - ls3:
+          - echo 3
+        - ls4:
+          - echo 4
+#   - server:
+#     - ssh hogehoge
+#     - &amp;lt;%= @settings[&amp;quot;password&amp;quot;] %&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ひとに画面を見せて作業するときのあれこれ</title>
+      <link>http://yomogitaro.github.io/article/post/2016-05-21_105348/</link>
+      <pubDate>Sat, 21 May 2016 10:53:48 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2016-05-21_105348/</guid>
+      <description>
+
+&lt;h1 id=&#34;デモ動画を撮りたい&#34;&gt;デモ動画を撮りたい&lt;/h1&gt;
+
+&lt;h2 id=&#34;スクリーンキャストソフト&#34;&gt;スクリーンキャストソフト&lt;/h2&gt;
+
+&lt;p&gt;kazam というのを使う&lt;/p&gt;
+
+&lt;h2 id=&#34;キーキャストソフト&#34;&gt;キーキャストソフト&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/wavexx/screenkey&#34;&gt;screen key&lt;/a&gt; というのを使う。
+apt だと 0.2 が入ってしまうので、  github から入れる。 0.9 を入れた。&lt;/p&gt;
+
+&lt;p&gt;コンフィグファイルは、 &lt;code&gt;~/.config/screencast.json&lt;/code&gt;。
+注意する。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{
+  &amp;quot;font_color&amp;quot;: &amp;quot;white&amp;quot;,
+  &amp;quot;persist&amp;quot;: true,
+  &amp;quot;timeout&amp;quot;: 1.0,
+  &amp;quot;multiline&amp;quot;: false,
+  &amp;quot;geometry&amp;quot;: null,
+  &amp;quot;bak_mode&amp;quot;: &amp;quot;baked&amp;quot;,
+  &amp;quot;recent_thr&amp;quot;: 0.1,
+  &amp;quot;font_size&amp;quot;: &amp;quot;small&amp;quot;,
+  &amp;quot;ignore&amp;quot;: [],
+  &amp;quot;mods_mode&amp;quot;: &amp;quot;normal&amp;quot;,
+  &amp;quot;vis_shift&amp;quot;: false,
+  &amp;quot;key_mode&amp;quot;: &amp;quot;composed&amp;quot;,
+  &amp;quot;position&amp;quot;: &amp;quot;bottom&amp;quot;,
+  &amp;quot;vis_space&amp;quot;: true,
+  &amp;quot;bg_color&amp;quot;: &amp;quot;black&amp;quot;,
+  &amp;quot;no_systray&amp;quot;: false,
+  &amp;quot;screen&amp;quot;: 0,
+  &amp;quot;compr_cnt&amp;quot;: 3,
+  &amp;quot;font_desc&amp;quot;: &amp;quot;\u307f\u304b\u3061\u3083\u3093-P 0&amp;quot;,
+  &amp;quot;mods_only&amp;quot;: false,
+  &amp;quot;opacity&amp;quot;: 0.1
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こんな感じにした。&lt;/p&gt;
+
+&lt;p&gt;左シフトと右シフトを同時に押すと、表示、非表示を切り替えられるのが便利。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>コミットしわすれている git リポジトリを通知する</title>
+      <link>http://yomogitaro.github.io/article/post/2016-05-15_092538/</link>
+      <pubDate>Sun, 15 May 2016 09:25:41 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2016-05-15_092538/</guid>
+      <description>
+
+&lt;h1 id=&#34;コミットしわすれている-git-リポジトリをきれいにした&#34;&gt;コミットしわすれている git リポジトリをきれいにした&lt;/h1&gt;
+
+&lt;p&gt;そもそもどんなリポジトリを作っていたかも謎になっていたので、探すところからやった。
+cron で実行して通知するために、&lt;code&gt;DBUS_SESSION_BUS_ADDRESS&lt;/code&gt;を探すところが苦労した。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;#!/usr/bin/env zsh
+
+SESSION_MANAGER=xfce4-session
+SCRIPT_NAME=&amp;quot;yomogi-git-commit-reminder&amp;quot;
+NOTIFY_LIFE_TIME=5000
+
+function LIST_GIT_DIRS() {
+    find $HOME -xdev -type d -name .git 2&amp;gt;/dev/null
+}
+
+
+function create_remind_reports() {
+    LINE=&#39;&#39;
+    LIST_GIT_DIRS | while read git_dir
+    do
+        CHANGED_LINES=`git --git-dir=&amp;quot;$git_dir&amp;quot; --work-tree=&amp;quot;$git_dir/..&amp;quot; status --porcelain | wc -l`
+
+        if [ $CHANGED_LINES -gt 0 ]
+        then
+            LINE=$LINE&amp;quot; `printf &amp;quot;%05d&amp;quot; $CHANGED_LINES` ${git_dir%/*} \n&amp;quot;
+        fi
+    done
+
+    echo $LINE;
+}
+
+
+function output_report() {
+    if [ &amp;quot;$VERBOSE&amp;quot; = &amp;quot;TRUE&amp;quot; ]
+    then
+        echo $REPORTS
+    fi
+
+    if [ &amp;quot;$NOTIFY&amp;quot; = &amp;quot;TRUE&amp;quot; ]
+    then
+        PID=$(pgrep xfce4-session)
+        dbus=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
+        export DBUS_SESSION_BUS_ADDRESS=$dbus
+
+        /usr/bin/notify-send --urgency=low --expire-time=$NOTIFY_LIFE_TIME --category=git \
+                    --icon=$HOME/var/image/Git-Icon-White.png \
+                    &#39;not commited git repos&#39; $REPORTS
+    fi;
+}
+
+
+###
+# main section
+VERBOSE=&amp;quot;TRUE&amp;quot;
+while getopts nq OPT
+do
+    case $OPT in
+        &amp;quot;n&amp;quot; ) NOTIFY=&amp;quot;TRUE&amp;quot; ;;
+        &amp;quot;q&amp;quot; ) VERBOSE=&amp;quot;FALSE&amp;quot; ;;
+          * ) echo &amp;quot;unexpected arg $OPT&amp;quot;
+               exit 1;;
+    esac
+done
+
+REPORTS=`create_remind_reports`
+output_report &amp;quot;$REPORTS&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;こんな感じで出てくる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;yomogi-git-commit-reminder.sh -n
+ 00003 /hoge/fuga
+ 00013 /piyo
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;-n&lt;/code&gt; をつけると通知が出るようにして crontab に追加した。&lt;/p&gt;
+
+&lt;h1 id=&#34;emacs-で-python-を書く設定をする&#34;&gt;emacs で python を書く設定をする&lt;/h1&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.emacswiki.org/emacs/PythonProgrammingInEmacs&#34;&gt;https://www.emacswiki.org/emacs/PythonProgrammingInEmacs&lt;/a&gt; を参考に書く。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Widows10 の bash を試してみる</title>
+      <link>http://yomogitaro.github.io/article/post/160409_windows10_bash/</link>
+      <pubDate>Sat, 09 Apr 2016 19:14:33 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/160409_windows10_bash/</guid>
+      <description>
+
+&lt;p&gt;&lt;a href=&#34;https://blogs.windows.com/windowsexperience/2016/04/06/announcing-windows-10-insider-preview-build-14316/&#34;&gt;Windows10 の build 14316 から bash が利用できるようになる&lt;/a&gt;との事だったので試してみる。
+いままで Windows のマシンを使うときは、 Windows 上に VM 立てたり、 Windows 用の Emacs と mingw 組み合わせて使ってたりしたけど、 Ubuntu on Windows で代替できるか試したい。
+Xming 使って、 ウインドウモードで起動できたら嬉しい。&lt;/p&gt;
+
+&lt;h1 id=&#34;セットアップ&#34;&gt;セットアップ&lt;/h1&gt;
+
+&lt;h2 id=&#34;windows-10-にする&#34;&gt;Windows 10 にする&lt;/h2&gt;
+
+&lt;p&gt;とりあえず、  Windows 8 を Windows 10 にする。
+1時間くらいかかった。&lt;/p&gt;
+
+&lt;h2 id=&#34;開発者モードにする&#34;&gt;開発者モードにする&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;設定から開発者モードにする。&lt;/li&gt;
+&lt;li&gt;再起動する。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;insider-preview-ビルドを取ってくる&#34;&gt;Insider Preview ビルドを取ってくる&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Insider Preview の登録をする&lt;/li&gt;
+&lt;li&gt;Insider のレベルをファーストにする
+ここが全然進まない。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;そのた&#34;&gt;そのた&lt;/h1&gt;
+
+&lt;p&gt;windows 10 に仮想デスクトップが追加されていてよかった。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Win + Ctrl + D: 新規デスクトップ&lt;/li&gt;
+&lt;li&gt;Win + Ctrl + カーソル：デスクトップ移動&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上下に配置したり、移動時のアニメーションを無効化したり、一番右端のデスクトップから、一番左端のデスクトップに移動できると嬉しいけど、設定が見つからなかった。&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>apt-get update できなくなった</title>
+      <link>http://yomogitaro.github.io/article/post/151115_ubuntu/</link>
+      <pubDate>Sun, 15 Nov 2015 01:35:35 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/151115_ubuntu/</guid>
+      <description>&lt;p&gt;apt-get update したらなんかエラーが出てきた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;W: Failed to fetch http://jp.archive.ubuntu.com/ubuntu/dists/vivid-updates/main/binary-amd64/Packages  Hash Sum mismatch
+
+W: Failed to fetch http://jp.archive.ubuntu.com/ubuntu/dists/vivid-updates/main/binary-i386/Packages  Hash Sum mismatch
+
+E: Some index files failed to download. They have been ignored, or old ones used instead.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;パッケージの状態を保存したファイルを削除&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo mv /var/lib/apt/lists /tmp/lists.back
+sudo apt-get autoclean
+sudo apt-get clean
+sudo apt-get update
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;治った&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>embulk で csv を elasticsearch に移したい</title>
+      <link>http://yomogitaro.github.io/article/post/embulk_css_to_es/</link>
+      <pubDate>Mon, 20 Jul 2015 22:53:57 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/embulk_css_to_es/</guid>
+      <description>
+
+&lt;h1 id=&#34;やりたいこと&#34;&gt;やりたいこと&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;csv のファイルの内容を elasticsearch に移行したい&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;試した方法&#34;&gt;試した方法&lt;/h1&gt;
+
+&lt;p&gt;embulk を利用すればできそうなので試してみた。&lt;/p&gt;
+
+&lt;h2 id=&#34;テスト用-elasticsearch-の準備&#34;&gt;テスト用 elasticsearch の準備　&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;elasticsearch を入れる
+&lt;code&gt;
+% docker run -d --name es1 elasticsearch
+&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;IP を確認して動いているか確認
+&lt;code&gt;
+% docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; es1
+% curl &#39;http://172.17.0.4:9200/_stats&#39;
+{&amp;quot;_shards&amp;quot;:{&amp;quot;total&amp;quot;:0,&amp;quot;successful&amp;quot;:0,&amp;quot;failed&amp;quot;:0},&amp;quot;_all&amp;quot;:{&amp;quot;primaries&amp;quot;:{},&amp;quot;total&amp;quot;:{}},&amp;quot;indices&amp;quot;:{}}%
+&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;ドキュメントを UI から確認するために kibana も用意
+&lt;code&gt;
+% docker run --link es1:elasticsearch -d --name kibana01 kibana
+% docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; kibana01
+&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://172.17.0.6:5601&#34;&gt;http://172.17.0.6:5601&lt;/a&gt; 動いているか見てみる&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;embulk-のインストール&#34;&gt;embulk のインストール&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;java が必要なので入れる
+&lt;code&gt;
+% sudo apt-get install openjdk-8-jdk 
+&lt;/code&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;ここに書いてあるとおりに入れてみる
+&lt;a href=&#34;https://github.com/embulk/embulk#linux--mac--bsd&#34;&gt;https://github.com/embulk/embulk#linux--mac--bsd&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;サンプルを動かしてみる&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;% embulk example ./try1
+% embulk guess ./try1/example.yml -o config.yml
+% embulk preview config.yml
+% embulk run config.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;embulk-elasticsearch-プラグインのインストール&#34;&gt;embulk elasticsearch プラグインのインストール&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;elasticsearch の output-plugin をインストール
+&lt;code&gt;
+% embulk gem install embulk-output-elasticsearch
+&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;example を下記のように編集
+```
+in:
+type: file
+path&lt;em&gt;prefix: &amp;ldquo;/tmp/try1/csv/sample&lt;/em&gt;&amp;ldquo;
+out:
+type: elasticsearch
+nodes:
+
+&lt;ul&gt;
+&lt;li&gt;{host: 172.17.0.4, port: 9300}
+index: embulk
+index_type: embulk
+```&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;config 再生成して実行
+&lt;code&gt;
+% embulk guess ./try1/example.yml -o config.yml
+% embulk run config.yml
+&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;うまくいっているか確認
+&lt;code&gt;
+curl &#39;http://172.17.0.4:9200/embulk/_search&#39; | jq .
+&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>ブログ始めるときに困ったこと</title>
+      <link>http://yomogitaro.github.io/article/post/blog_go/</link>
+      <pubDate>Mon, 20 Jul 2015 22:16:50 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/blog_go/</guid>
+      <description>
+
+&lt;h1 id=&#34;どういうふうにブログを作ったか&#34;&gt;どういうふうにブログを作ったか&lt;/h1&gt;
+
+&lt;p&gt;この blog は下記のものでできている。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;hugo&lt;/li&gt;
+&lt;li&gt;github pages&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;github pages は下記の２通りの方法があるようだった。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;username.github.io という名前のリポジトリを作る&lt;/li&gt;
+&lt;li&gt;任意のリポジトリに gh-pages というブランチを作る&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;後者を利用することにした。
+master ブランチにブログのソースを置いて,
+ビルドした結果を公開ブランチにするほうが良さそうだと思った。&lt;/p&gt;
+
+&lt;p&gt;hugo の最上部のブランチを master,
+public ディレクトリを gh-pages にした。&lt;/p&gt;
+
+&lt;p&gt;主に下記のサイトを参考にした。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://gohugo.io/overview/introduction/&#34;&gt;http://gohugo.io/overview/introduction/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://help.github.com/articles/user-organization-and-project-pages/#project-pages&#34;&gt;https://help.github.com/articles/user-organization-and-project-pages/#project-pages&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&#34;構築中に詰まったところ&#34;&gt;構築中に詰まったところ&lt;/h1&gt;
+
+&lt;h2 id=&#34;go-インストール後パスを通したのに-go-がないと言われる&#34;&gt;go インストール後パスを通したのに go がないと言われる&lt;/h2&gt;
+
+&lt;p&gt;go を実行したら下記のようなメッセージが出てきた。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;$ go
+zsh: no such file or directory: {{go のパス}}/go
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;下記を見なおしたが問題が無かった。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;PATH 設定&lt;/li&gt;
+&lt;li&gt;GOROOT 設定&lt;/li&gt;
+&lt;li&gt;GOPATH 設定&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;入れていた go のバイナリが間違っていたことがわかり、
+入れなおしたらうまく動いた。
+64bit が必要だが Linux 32-bit を入れてしまっていた。
+恥ずかしいミスだった。&lt;/p&gt;
+
+&lt;h2 id=&#34;hugo-テーマがうまく当たらない&#34;&gt;hugo テーマがうまく当たらない&lt;/h2&gt;
+
+&lt;p&gt;hugo のテーマがうまく当たらなかった。
+サイトのパスのトップに css や js がないとうまく動かなかった。
+パスを設定できるようにして当たるようにした。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>ブログはじめました</title>
-      <link>http://localhost:1313/article/post/first/</link>
+      <link>http://yomogitaro.github.io/article/post/first/</link>
       <pubDate>Sun, 19 Jul 2015 17:59:50 +0900</pubDate>
       
-      <guid>http://localhost:1313/article/post/first/</guid>
+      <guid>http://yomogitaro.github.io/article/post/first/</guid>
       <description>&lt;p&gt;ブログはじめました!&lt;/p&gt;
 </description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>http://yomogitaro.github.io/article/post/2016-07-03_154326/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2016-07-03_154326/</guid>
+      <description></description>
     </item>
     
   </channel>

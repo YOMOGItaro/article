@@ -11,7 +11,7 @@
     <atom:link href="http://yomogitaro.github.io/article/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>evm と Emacs 25.1 とローダブルモジュール</title>
+      <title>evm と Emacs 25.1 とモジュール</title>
       <link>http://yomogitaro.github.io/article/post/2016-10-09_112745/</link>
       <pubDate>Sun, 09 Oct 2016 11:27:46 +0900</pubDate>
       
@@ -25,7 +25,7 @@
 
 &lt;p&gt;試してみる、ついでに evm を試したりする。&lt;/p&gt;
 
-&lt;p&gt;&lt;code&gt;--with-module&lt;/code&gt; がないとローダブルモジュールが動かないところではまったりした。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;--with-module&lt;/code&gt; がないとモジュールが動かないところではまったりした。&lt;/p&gt;
 
 &lt;h1 id=&#34;evm-で-emacs-25-1-を試す&#34;&gt;evm で Emacs 25.1 を試す&lt;/h1&gt;
 
@@ -285,7 +285,7 @@ tekito
 &lt;h1 id=&#34;まとめ&#34;&gt;まとめ&lt;/h1&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Emacs 25.1 でローダブルモジュールを使うときには、 Emacs をビルドするときに &lt;code&gt;--with-modules&lt;/code&gt; のオプションがいる。&lt;/li&gt;
+&lt;li&gt;Emacs 25.1 でモジュールを使うときには、 Emacs をビルドするときに &lt;code&gt;--with-modules&lt;/code&gt; のオプションがいる。&lt;/li&gt;
 &lt;li&gt;C と C++ 以外で使えるのかはよくわからなかった。&lt;/li&gt;
 &lt;/ul&gt;
 

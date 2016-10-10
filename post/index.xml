@@ -1005,77 +1005,74 @@ sudo apt-get update
 
 &lt;h2 id=&#34;テスト用-elasticsearch-の準備&#34;&gt;テスト用 elasticsearch の準備　&lt;/h2&gt;
 
-&lt;ul&gt;
-&lt;li&gt;elasticsearch を入れる
-&lt;code&gt;
-% docker run -d --name es1 elasticsearch
-&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;IP を確認して動いているか確認
-&lt;code&gt;
-% docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; es1
+&lt;p&gt;elasticsearch を入れる&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% docker run -d --name es1 elasticsearch
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;IP を確認して動いているか確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; es1
 % curl &#39;http://172.17.0.4:9200/_stats&#39;
 {&amp;quot;_shards&amp;quot;:{&amp;quot;total&amp;quot;:0,&amp;quot;successful&amp;quot;:0,&amp;quot;failed&amp;quot;:0},&amp;quot;_all&amp;quot;:{&amp;quot;primaries&amp;quot;:{},&amp;quot;total&amp;quot;:{}},&amp;quot;indices&amp;quot;:{}}%
-&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;ドキュメントを UI から確認するために kibana も用意
-&lt;code&gt;
-% docker run --link es1:elasticsearch -d --name kibana01 kibana
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ドキュメントを UI から確認するために kibana も用意&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% docker run --link es1:elasticsearch -d --name kibana01 kibana
 % docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; kibana01
-&lt;/code&gt;&lt;/li&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://172.17.0.6:5601&#34;&gt;http://172.17.0.6:5601&lt;/a&gt; 動いているか見てみる&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;embulk-のインストール&#34;&gt;embulk のインストール&lt;/h2&gt;
 
-&lt;ul&gt;
-&lt;li&gt;java が必要なので入れる
-&lt;code&gt;
-% sudo apt-get install openjdk-8-jdk 
-&lt;/code&gt;&lt;/li&gt;
+&lt;p&gt;java が必要なので入れる&lt;/p&gt;
 
-&lt;li&gt;&lt;p&gt;ここに書いてあるとおりに入れてみる
-&lt;a href=&#34;https://github.com/embulk/embulk#linux--mac--bsd&#34;&gt;https://github.com/embulk/embulk#linux--mac--bsd&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% sudo apt-get install openjdk-8-jdk 
+&lt;/code&gt;&lt;/pre&gt;
 
-&lt;li&gt;&lt;p&gt;サンプルを動かしてみる&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/embulk/embulk#linux--mac--bsd&#34;&gt;ここ&lt;/a&gt;に書いてあるとおりに入れてみる
+サンプルを動かしてみる&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;% embulk example ./try1
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% embulk example ./try1
 % embulk guess ./try1/example.yml -o config.yml
 % embulk preview config.yml
 % embulk run config.yml
-&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;embulk-elasticsearch-プラグインのインストール&#34;&gt;embulk elasticsearch プラグインのインストール&lt;/h2&gt;
 
-&lt;ul&gt;
-&lt;li&gt;elasticsearch の output-plugin をインストール
-&lt;code&gt;
-% embulk gem install embulk-output-elasticsearch
-&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;example を下記のように編集
-```
-in:
-type: file
-path&lt;em&gt;prefix: &amp;ldquo;/tmp/try1/csv/sample&lt;/em&gt;&amp;ldquo;
-out:
-type: elasticsearch
-nodes:
+&lt;p&gt;elasticsearch の output-plugin をインストール&lt;/p&gt;
 
-&lt;ul&gt;
-&lt;li&gt;{host: 172.17.0.4, port: 9300}
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% embulk gem install embulk-output-elasticsearch
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;example を下記のように編集&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;in:
+  type: file
+  path_prefix: &amp;quot;/tmp/try1/csv/sample_&amp;quot;
+out:
+  type: elasticsearch
+  nodes:
+  - {host: 172.17.0.4, port: 9300}
 index: embulk
-index_type: embulk
-```&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;config 再生成して実行
-&lt;code&gt;
-% embulk guess ./try1/example.yml -o config.yml
+  index_type: embulk
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;config 再生成して実行&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% embulk guess ./try1/example.yml -o config.yml
 % embulk run config.yml
-&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;うまくいっているか確認
-&lt;code&gt;
-curl &#39;http://172.17.0.4:9200/embulk/_search&#39; | jq .
-&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;うまくいっているか確認&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;curl &#39;http://172.17.0.4:9200/embulk/_search&#39; | jq .
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

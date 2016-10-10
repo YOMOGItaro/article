@@ -81,77 +81,74 @@
 
 <h2 id="テスト用-elasticsearch-の準備">テスト用 elasticsearch の準備　</h2>
 
-<ul>
-<li>elasticsearch を入れる
-<code>
-% docker run -d --name es1 elasticsearch
-</code></li>
-<li>IP を確認して動いているか確認
-<code>
-% docker inspect --format '{{ .NetworkSettings.IPAddress }}' es1
+<p>elasticsearch を入れる</p>
+
+<pre><code class="language-zsh">% docker run -d --name es1 elasticsearch
+</code></pre>
+
+<p>IP を確認して動いているか確認</p>
+
+<pre><code class="language-zsh">% docker inspect --format '{{ .NetworkSettings.IPAddress }}' es1
 % curl 'http://172.17.0.4:9200/_stats'
 {&quot;_shards&quot;:{&quot;total&quot;:0,&quot;successful&quot;:0,&quot;failed&quot;:0},&quot;_all&quot;:{&quot;primaries&quot;:{},&quot;total&quot;:{}},&quot;indices&quot;:{}}%
-</code></li>
-<li>ドキュメントを UI から確認するために kibana も用意
-<code>
-% docker run --link es1:elasticsearch -d --name kibana01 kibana
+</code></pre>
+
+<p>ドキュメントを UI から確認するために kibana も用意</p>
+
+<pre><code class="language-zsh">% docker run --link es1:elasticsearch -d --name kibana01 kibana
 % docker inspect --format '{{ .NetworkSettings.IPAddress }}' kibana01
-</code></li>
+</code></pre>
+
+<ul>
 <li><a href="http://172.17.0.6:5601">http://172.17.0.6:5601</a> 動いているか見てみる</li>
 </ul>
 
 <h2 id="embulk-のインストール">embulk のインストール</h2>
 
-<ul>
-<li>java が必要なので入れる
-<code>
-% sudo apt-get install openjdk-8-jdk 
-</code></li>
+<p>java が必要なので入れる</p>
 
-<li><p>ここに書いてあるとおりに入れてみる
-<a href="https://github.com/embulk/embulk#linux--mac--bsd">https://github.com/embulk/embulk#linux--mac--bsd</a></p></li>
+<pre><code class="language-zsh">% sudo apt-get install openjdk-8-jdk 
+</code></pre>
 
-<li><p>サンプルを動かしてみる</p>
+<p><a href="https://github.com/embulk/embulk#linux--mac--bsd">ここ</a>に書いてあるとおりに入れてみる
+サンプルを動かしてみる</p>
 
-<pre><code>% embulk example ./try1
+<pre><code class="language-zsh">% embulk example ./try1
 % embulk guess ./try1/example.yml -o config.yml
 % embulk preview config.yml
 % embulk run config.yml
-</code></pre></li>
-</ul>
+</code></pre>
 
 <h2 id="embulk-elasticsearch-プラグインのインストール">embulk elasticsearch プラグインのインストール</h2>
 
-<ul>
-<li>elasticsearch の output-plugin をインストール
-<code>
-% embulk gem install embulk-output-elasticsearch
-</code></li>
-<li>example を下記のように編集
-```
-in:
-type: file
-path<em>prefix: &ldquo;/tmp/try1/csv/sample</em>&ldquo;
-out:
-type: elasticsearch
-nodes:
+<p>elasticsearch の output-plugin をインストール</p>
 
-<ul>
-<li>{host: 172.17.0.4, port: 9300}
+<pre><code class="language-zsh">% embulk gem install embulk-output-elasticsearch
+</code></pre>
+
+<p>example を下記のように編集</p>
+
+<pre><code class="language-yaml">in:
+  type: file
+  path_prefix: &quot;/tmp/try1/csv/sample_&quot;
+out:
+  type: elasticsearch
+  nodes:
+  - {host: 172.17.0.4, port: 9300}
 index: embulk
-index_type: embulk
-```</li>
-</ul></li>
-<li>config 再生成して実行
-<code>
-% embulk guess ./try1/example.yml -o config.yml
+  index_type: embulk
+</code></pre>
+
+<p>config 再生成して実行</p>
+
+<pre><code class="language-zsh">% embulk guess ./try1/example.yml -o config.yml
 % embulk run config.yml
-</code></li>
-<li>うまくいっているか確認
-<code>
-curl 'http://172.17.0.4:9200/embulk/_search' | jq .
-</code></li>
-</ul>
+</code></pre>
+
+<p>うまくいっているか確認</p>
+
+<pre><code class="language-zsh">curl 'http://172.17.0.4:9200/embulk/_search' | jq .
+</code></pre>
 
       
       

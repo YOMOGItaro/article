@@ -15,18 +15,23 @@ embulk を利用すればできそうなので試してみた。
 
 ## テスト用 elasticsearch の準備　 ##
 
-* elasticsearch を入れる
-```
+elasticsearch を入れる
+
+``` zsh
 % docker run -d --name es1 elasticsearch
 ```
-* IP を確認して動いているか確認
-```
+
+IP を確認して動いているか確認
+
+``` zsh
 % docker inspect --format '{{ .NetworkSettings.IPAddress }}' es1
 % curl 'http://172.17.0.4:9200/_stats'
 {"_shards":{"total":0,"successful":0,"failed":0},"_all":{"primaries":{},"total":{}},"indices":{}}%
 ```
-* ドキュメントを UI から確認するために kibana も用意
-```
+
+ドキュメントを UI から確認するために kibana も用意
+
+``` zsh
 % docker run --link es1:elasticsearch -d --name kibana01 kibana
 % docker inspect --format '{{ .NetworkSettings.IPAddress }}' kibana01
 ```
@@ -34,15 +39,14 @@ embulk を利用すればできそうなので試してみた。
 
 ## embulk のインストール ##
 
-* java が必要なので入れる
-```
+java が必要なので入れる
+``` zsh
 % sudo apt-get install openjdk-8-jdk 
 ```
-* ここに書いてあるとおりに入れてみる
-https://github.com/embulk/embulk#linux--mac--bsd
 
-* サンプルを動かしてみる
-```
+[ここ](https://github.com/embulk/embulk#linux--mac--bsd)に書いてあるとおりに入れてみる
+サンプルを動かしてみる
+``` zsh
 % embulk example ./try1
 % embulk guess ./try1/example.yml -o config.yml
 % embulk preview config.yml
@@ -51,12 +55,13 @@ https://github.com/embulk/embulk#linux--mac--bsd
 
 ## embulk elasticsearch プラグインのインストール ##
 
-* elasticsearch の output-plugin をインストール
-```
+elasticsearch の output-plugin をインストール
+``` zsh
 % embulk gem install embulk-output-elasticsearch
 ```
-* example を下記のように編集
-```
+example を下記のように編集
+
+``` yaml
 in:
   type: file
   path_prefix: "/tmp/try1/csv/sample_"
@@ -64,15 +69,15 @@ out:
   type: elasticsearch
   nodes:
   - {host: 172.17.0.4, port: 9300}
-  index: embulk
+index: embulk
   index_type: embulk
 ```
-* config 再生成して実行
-```
+config 再生成して実行
+``` zsh
 % embulk guess ./try1/example.yml -o config.yml
 % embulk run config.yml
 ```
-* うまくいっているか確認
-```
+うまくいっているか確認
+``` zsh
 curl 'http://172.17.0.4:9200/embulk/_search' | jq .
 ```

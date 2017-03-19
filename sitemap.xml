@@ -2,6 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yomogitaro.github.io/article/post/2017-03-19_195229/</loc>
+    <lastmod>2017-03-19T19:52:30+09:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://yomogitaro.github.io/article/post/2017-03-19_191725/</loc>
+    <lastmod>2017-03-19T19:17:27+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://yomogitaro.github.io/article/post/2016-10-09_112745/</loc>
     <lastmod>2016-10-09T11:27:46+09:00</lastmod>
   </url>
@@ -58,7 +68,7 @@
   
   <url>
     <loc>http://yomogitaro.github.io/article/post/</loc>
-    <lastmod>2016-10-09T11:27:46+09:00</lastmod>
+    <lastmod>2017-03-19T19:52:30+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -69,7 +79,7 @@
   
   <url>
     <loc>http://yomogitaro.github.io/article/</loc>
-    <lastmod>2016-10-09T11:27:46+09:00</lastmod>
+    <lastmod>2017-03-19T19:52:30+09:00</lastmod>
     <priority>0</priority>
   </url>
   

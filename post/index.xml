@@ -7,8 +7,191 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Written by YOMOGITARO</copyright>
-    <lastBuildDate>Sun, 09 Oct 2016 11:27:46 +0900</lastBuildDate>
+    <lastBuildDate>Sun, 19 Mar 2017 19:52:30 +0900</lastBuildDate>
     <atom:link href="http://yomogitaro.github.io/article/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>IPAM DCIM ツールの netbox を試してみる</title>
+      <link>http://yomogitaro.github.io/article/post/2017-03-19_195229/</link>
+      <pubDate>Sun, 19 Mar 2017 19:52:30 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2017-03-19_195229/</guid>
+      <description>
+
+&lt;p&gt;ちょっと前に&lt;a href=&#34;https://netbox.readthedocs.io/en/latest/&#34;&gt;netbox&lt;/a&gt;というツールが良いと教えてもらったので試してみる。自分がためしたバージョンは v1.9.2。
+&lt;a href=&#34;https://github.com/digitalocean/netbox&#34;&gt;netbox&lt;/a&gt; 自体は、 Django で書かれた Web アプリケーション。 &lt;a href=&#34;https://github.com/digitalocean/go-netbox&#34;&gt;go-netbox&lt;/a&gt; という golang で書かれた API クライアントもある。&lt;/p&gt;
+
+&lt;p&gt;netbox のリポジトリに &lt;code&gt;docker-compose.yml&lt;/code&gt; ファイルがあるのでこれを使ってたてていろいろ netbox と go-netbox を触ってみた。
+&lt;a href=&#34;http://netbox.readthedocs.io/en/stable/installation/docker/&#34;&gt;http://netbox.readthedocs.io/en/stable/installation/docker/&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;web-ui-から一通りつかってみる&#34;&gt;Web UI から一通りつかってみる&lt;/h1&gt;
+
+&lt;p&gt;ログインするとダッシュボード画面が出てくる。
+地域を管理する機能、DCIMとしての機能、IPAMとしての機能、エンドポイント間のリンクを管理する機能、パスワードなどの機密情報を管理する機能で分かれている。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;DCIM は使ったことがないので何ができると良いのかはよくわかっていない。
+機器の配置を決めてラック図を作ったり、
+製造元やシリアルナンバーなどの機器の情報を管理できるみたいだった。&lt;/p&gt;
+
+&lt;p&gt;IPAM としては、 VLAN やサブネット、IP が管理できた。
+Tenant や Site と紐付けることができたるので、目的の情報に到達しやすそう。
+Site は親子関係をつくって階層分けできたのも良かった。
+IP や VLAN などの登録は、 csv から一括登録するなどの方法が用意されていた。&lt;/p&gt;
+
+&lt;p&gt;管理者画面の &lt;a href=&#34;https://netbox.readthedocs.io/en/stable/data-model/extras/&#34;&gt;Extra&lt;/a&gt; というところで、
+Custom Field の追加や、 Export Template の追加は試せた。
+Export Template で Custom Field を指定できなかったりしたけど一通り動いた。
+外部からグラフを表示する機能や、トポロジマップの機能もあるようだった。&lt;/p&gt;
+
+&lt;h1 id=&#34;api-について&#34;&gt;API について&lt;/h1&gt;
+
+&lt;p&gt;&lt;code&gt;/api/docs/&lt;/code&gt; などを見に行くと Swagger UI で API の一覧が見られる。
+&lt;code&gt;django-rest-swagger&lt;/code&gt; で Swagger のドキュメントを生成しているみたいだった。
+基本的に GET の API しか用意されていないみたいだった。
+IPAM 系は GET の API しか存在しなかった。&lt;/p&gt;
+
+&lt;h1 id=&#34;go-netbox-試してみる&#34;&gt;go-netbox 試してみる&lt;/h1&gt;
+
+&lt;p&gt;golang の API クライアントの go-netbox を使ってみた。
+IP の一覧を取得するコードを適当に作った。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+
+import (
+    &amp;quot;fmt&amp;quot;
+    &amp;quot;github.com/digitalocean/go-netbox&amp;quot;
+)
+
+func main() {
+    c, _ := netbox.NewClient(&amp;quot;http://localhost&amp;quot;, nil);
+    ips, _ := c.IPAM.ListIPAddresses(nil)
+    for _, ip := range ips{
+        marshaled, _ := ip.MarshalJSON()
+        fmt.Println(string(marshaled));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;出力はこんな感じになる。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;{&amp;quot;id&amp;quot;:1,&amp;quot;family&amp;quot;:4,&amp;quot;address&amp;quot;:&amp;quot;192.168.0.3/32&amp;quot;,&amp;quot;vrf&amp;quot;:null,&amp;quot;interface&amp;quot;:null,&amp;quot;description&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;nat_inside&amp;quot;:null,&amp;quot;nat_outside&amp;quot;:null}
+{&amp;quot;id&amp;quot;:2,&amp;quot;family&amp;quot;:4,&amp;quot;address&amp;quot;:&amp;quot;192.168.0.4/32&amp;quot;,&amp;quot;vrf&amp;quot;:null,&amp;quot;interface&amp;quot;:null,&amp;quot;description&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;nat_inside&amp;quot;:null,&amp;quot;nat_outside&amp;quot;:null}
+{&amp;quot;id&amp;quot;:3,&amp;quot;family&amp;quot;:4,&amp;quot;address&amp;quot;:&amp;quot;192.168.0.5/32&amp;quot;,&amp;quot;vrf&amp;quot;:null,&amp;quot;interface&amp;quot;:null,&amp;quot;description&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;nat_inside&amp;quot;:null,&amp;quot;nat_outside&amp;quot;:null}
+{&amp;quot;id&amp;quot;:4,&amp;quot;family&amp;quot;:4,&amp;quot;address&amp;quot;:&amp;quot;192.168.0.13/32&amp;quot;,&amp;quot;vrf&amp;quot;:null,&amp;quot;interface&amp;quot;:null,&amp;quot;description&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;nat_inside&amp;quot;:null,&amp;quot;nat_outside&amp;quot;:null}
+{&amp;quot;id&amp;quot;:5,&amp;quot;family&amp;quot;:4,&amp;quot;address&amp;quot;:&amp;quot;192.168.0.14/32&amp;quot;,&amp;quot;vrf&amp;quot;:null,&amp;quot;interface&amp;quot;:null,&amp;quot;description&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;nat_inside&amp;quot;:null,&amp;quot;nat_outside&amp;quot;:null}
+{&amp;quot;id&amp;quot;:6,&amp;quot;family&amp;quot;:4,&amp;quot;address&amp;quot;:&amp;quot;192.168.0.15/32&amp;quot;,&amp;quot;vrf&amp;quot;:null,&amp;quot;interface&amp;quot;:null,&amp;quot;description&amp;quot;:&amp;quot;&amp;quot;,&amp;quot;nat_inside&amp;quot;:null,&amp;quot;nat_outside&amp;quot;:null}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;試している時にとったいろいろなキャプチャ&#34;&gt;試している時にとったいろいろなキャプチャ&lt;/h1&gt;
+
+&lt;h4 id=&#34;ipam-は-get-系の-api-しかなくて残念&#34;&gt;IPAM は GET 系の API しかなくて残念&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox001.png&#34; alt=&#34;GET 系の API しかなくて残念の図&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;ラック図がみれる&#34;&gt;ラック図がみれる&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;ある-site-の-ip-を一つ取ろうと思った時の操作&#34;&gt;ある Site の IP を一つ取ろうと思った時の操作&lt;/h3&gt;
+
+&lt;h4 id=&#34;site-を選んで&#34;&gt;Site を選んで、&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox004.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;prefix-を選んで&#34;&gt;Prefix を選んで、&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox005.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;add-ip-を押して&#34;&gt;Add IP を押して、&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox006.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;ip-を取る&#34;&gt;IP を取る&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox007.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;追加する-ip-は-複数同時に指定したりできる&#34;&gt;追加する IP は、複数同時に指定したりできる&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox008.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;csv-形式で大量に追加することもできる&#34;&gt;csv 形式で大量に追加することもできる&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox009.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;extra-を試した&#34;&gt;Extra を試した&lt;/h3&gt;
+
+&lt;h4 id=&#34;custom-field-追加&#34;&gt;Custom Field 追加&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox010.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;custom-field-ができた&#34;&gt;Custom Field ができた&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox011.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;export-template-追加&#34;&gt;Export Template 追加&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox012.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&#34;export-template-出力&#34;&gt;Export Template 出力&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code&gt;- address: 192.168.0.3/32
+  status: 2
+- address: 192.168.0.4/32
+  status: 2
+- address: 192.168.0.5/32
+  status: 2
+- address: 192.168.0.13/32
+  status: 2
+- address: 192.168.0.14/32
+  status: 2
+- address: 192.168.0.15/32
+  status: 2
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>PC の設定で覚えておきたいこと</title>
+      <link>http://yomogitaro.github.io/article/post/2017-03-19_191725/</link>
+      <pubDate>Sun, 19 Mar 2017 19:17:27 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2017-03-19_191725/</guid>
+      <description>
+
+&lt;p&gt;PC を買ったのでやったことで覚えておきたいことを書く。&lt;/p&gt;
+
+&lt;h1 id=&#34;hidpi-対策&#34;&gt;HiDPI 対策&lt;/h1&gt;
+
+&lt;p&gt;lavie HZ は HiDPI なので対策をする。&lt;/p&gt;
+
+&lt;h2 id=&#34;xfce-のフォントの設定を変更&#34;&gt;Xfce のフォントの設定を変更&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://wiki.archlinuxjp.org/index.php/HiDPI#Xfce&#34;&gt;ここ&lt;/a&gt;を参考にして変えた。
+1.5倍くらいが良かったので144にした。
+設定は &lt;code&gt;~/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml&lt;/code&gt; にかかれていた。&lt;/p&gt;
+
+&lt;h2 id=&#34;firefox-の設定を変更&#34;&gt;firefox の設定を変更&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://wiki.archlinuxjp.org/index.php/HiDPI#Firefox&#34;&gt;ここ&lt;/a&gt;を参考にして変えた。&lt;/p&gt;
+
+&lt;h1 id=&#34;タッチパッド関係&#34;&gt;タッチパッド関係&lt;/h1&gt;
+
+&lt;p&gt;キータイプ中にタッチパッドによく触れてしまうので、何かしら対策する。&lt;/p&gt;
+
+&lt;h2 id=&#34;タイプ中にタッチパッドを無効にする設定をした&#34;&gt;タイプ中にタッチパッドを無効にする設定をした。&lt;/h2&gt;
+
+&lt;p&gt;Mouse and Touchpad メニューで、タイピング中のタッチパッドを無効にするオプションがあったので有効にした。
+0.3 秒に設定した。
+設定は &lt;code&gt;/.config/xfce4/xfconf/xfce-perchannel-xml/pointers.xml&lt;/code&gt; にかかれていた。&lt;/p&gt;
+
+&lt;h2 id=&#34;タッチパッドを無効にできるようにする&#34;&gt;タッチパッドを無効にできるようにする&lt;/h2&gt;
+
+&lt;p&gt;それでも気になる時もあるので、
+&lt;a href=&#34;http://d.hatena.ne.jp/ino46/20110215/1297761564&#34;&gt;ここ&lt;/a&gt;を参考に設定できるようにした。
+右 Ctrl で無効/有効にできるようにした。&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>evm と Emacs 25.1 とモジュール</title>

@@ -2,11 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://yomogitaro.github.io/article/</loc>
-    <lastmod>2016-10-09T11:27:46+09:00</lastmod>
-  </url>
-  
-  <url>
     <loc>http://yomogitaro.github.io/article/post/2016-10-09_112745/</loc>
     <lastmod>2016-10-09T11:27:46+09:00</lastmod>
   </url>
@@ -57,7 +52,25 @@
   </url>
   
   <url>
-    <loc>http://yomogitaro.github.io/article/post/2016-07-03_154326/</loc>
+    <loc>http://yomogitaro.github.io/article/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://yomogitaro.github.io/article/post/</loc>
+    <lastmod>2016-10-09T11:27:46+09:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://yomogitaro.github.io/article/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://yomogitaro.github.io/article/</loc>
+    <lastmod>2016-10-09T11:27:46+09:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>

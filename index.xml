@@ -6,7 +6,7 @@
     <description>Recent content on よもぎさんのへや</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
-    <copyright>Written by YOMOGItanpop</copyright>
+    <copyright>Written by YOMOGITARO</copyright>
     <lastBuildDate>Sun, 09 Oct 2016 11:27:46 +0900</lastBuildDate>
     <atom:link href="http://yomogitaro.github.io/article/index.xml" rel="self" type="application/rss+xml" />
     
@@ -1153,15 +1153,6 @@ zsh: no such file or directory: {{go のパス}}/go
       <guid>http://yomogitaro.github.io/article/post/first/</guid>
       <description>&lt;p&gt;ブログはじめました!&lt;/p&gt;
 </description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>http://yomogitaro.github.io/article/post/2016-07-03_154326/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://yomogitaro.github.io/article/post/2016-07-03_154326/</guid>
-      <description></description>
     </item>
     
   </channel>

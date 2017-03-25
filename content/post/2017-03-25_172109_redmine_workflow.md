@@ -1,6 +1,6 @@
 +++
 date = "2017-03-25T17:21:09+09:00"
-draft = true
+draft = false
 title = "redmine のワークフローでいろいろやる"
 
 +++

@@ -7,8 +7,214 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>ja</language>
     <copyright>Written by YOMOGITARO</copyright>
-    <lastBuildDate>Sun, 19 Mar 2017 19:52:30 +0900</lastBuildDate>
+    <lastBuildDate>Sat, 25 Mar 2017 17:21:09 +0900</lastBuildDate>
     <atom:link href="http://yomogitaro.github.io/article/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>redmine のワークフローでいろいろやる</title>
+      <link>http://yomogitaro.github.io/article/post/2017-03-25_172109_redmine_workflow/</link>
+      <pubDate>Sat, 25 Mar 2017 17:21:09 +0900</pubDate>
+      
+      <guid>http://yomogitaro.github.io/article/post/2017-03-25_172109_redmine_workflow/</guid>
+      <description>
+
+&lt;p&gt;redmine のワークフロー設定でできることをまとめておきたい。
+ワークフローを作りたい人が Administrator 権限を持っていないことがあると思うので、
+どこの操作までを普通のユーザーができるのかまとめておく。&lt;/p&gt;
+
+&lt;h1 id=&#34;ワークフローを作るときに必要な操作と権限&#34;&gt;ワークフローを作るときに必要な操作と権限&lt;/h1&gt;
+
+&lt;p&gt;先にどういうワークフローにしたいのかを決めておいたほうが設定しやすそう。
+状態遷移図までかけるとやりやすい。
+状態を issue ステータスで定義し、遷移を issue ワークフローステータス遷移と、ロールで制御すれば良さそう。&lt;/p&gt;
+
+&lt;p&gt;ワークフローのイメージができたら、ロール、トラッカー、ステータス、フローを洗い出して、
+Adminstrator でしか追加できない項目をお願いすれば良い。&lt;/p&gt;
+
+&lt;p&gt;Administrator 以外でもできる操作を簡単に調べてみたら、
+以下のような感じだった。&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;操作&lt;/th&gt;
+&lt;th&gt;Administrator 以外でもできるか？&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;ユーザーを作る&lt;/td&gt;
+&lt;td&gt;x&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;プロジェクトを作る&lt;/td&gt;
+&lt;td&gt;o (Create Project 権限があれば)&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;ロールを追加する&lt;/td&gt;
+&lt;td&gt;x&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;プロジェクトにユーザーを追加&lt;/td&gt;
+&lt;td&gt;o&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;プロジェクトでのユーザーのロールを設定&lt;/td&gt;
+&lt;td&gt;o&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;issue トラッカーの追加&lt;/td&gt;
+&lt;td&gt;x&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;issue ステータスの追加&lt;/td&gt;
+&lt;td&gt;x&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;issue ワークフローステータス遷移の設定&lt;/td&gt;
+&lt;td&gt;x&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;issue ワークフローステータスごとのパラメータ操作権限の設定&lt;/td&gt;
+&lt;td&gt;x&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h1 id=&#34;実際にやってみる&#34;&gt;実際にやってみる&lt;/h1&gt;
+
+&lt;p&gt;実際に何かのフローを考えてみたい。
+許可をもらって作業をする場合のワークフローを試しに考えてみた。
+作業をする前に責任者の許可をもらうこと、責任者の許可をもらう前に別の開発者に作業内容をレビューしてもらうのがルールとしてフローを設定してみる。&lt;/p&gt;
+
+&lt;h2 id=&#34;フローを列挙する&#34;&gt;フローを列挙する&lt;/h2&gt;
+
+&lt;p&gt;実際にどういうフローが考えられるか書いてみた。
+状態遷移図書くのは面倒だったので適当に列挙した。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;基本的なフロー
+
+&lt;ul&gt;
+&lt;li&gt;None &amp;mdash;(開発者)&amp;mdash;&amp;gt; 新規 &amp;mdash;(開発者)&amp;mdash;&amp;gt; レビュー待ち &amp;mdash;(起案者以外の開発者)&amp;mdash;&amp;gt; 作業承認待ち &amp;mdash;(管理者)&amp;mdash;&amp;gt; 作業待ち &amp;mdash;(開発者)&amp;mdash;&amp;gt; 作業完了確認待ち &amp;mdash;(管理者)&amp;mdash;&amp;gt; 終了&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;レビューで指摘があって、再レビュー
+
+&lt;ul&gt;
+&lt;li&gt;レビュー待ち &amp;mdash;(起案者以外の開発者)&amp;mdash;&amp;gt; レビューフィードバック &amp;mdash;(開発者)&amp;mdash;&amp;gt; レビュー待ち&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;作業承認で質問があって再レビュー
+
+&lt;ul&gt;
+&lt;li&gt;作業承認待ち &amp;mdash;(管理者)&amp;mdash;&amp;gt; 作業承認フィードバック &amp;mdash;(開発者)&amp;mdash;&amp;gt; 作業承認待ち&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;作業承認の質問で手順を変えて再レビュー
+
+&lt;ul&gt;
+&lt;li&gt;作業承認フィードバック &amp;mdash;(開発者)&amp;mdash;&amp;gt; レビュー待ち&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;起案者、管理者のみいつでも却下できる
+
+&lt;ul&gt;
+&lt;li&gt;すべて &amp;mdash;(起案者の開発者)&amp;mdash;&amp;gt; 却下&lt;/li&gt;
+&lt;li&gt;すべて &amp;mdash;(管理者)&amp;mdash;&amp;gt; 却下&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;ステータスごとに設定したい制約を列挙する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;制約
+
+&lt;ul&gt;
+&lt;li&gt;レビュー待ちから作業待ちの間、管理者以外は description を変更できない&lt;/li&gt;
+&lt;li&gt;ステータスを変更せずにコメントはいつでもできる&lt;/li&gt;
+&lt;li&gt;作業承認待ちまでには、開始日が設定されている&lt;/li&gt;
+&lt;li&gt;作業完了確認待ちまでには、終了日が設定されている&lt;/li&gt;
+&lt;li&gt;トラッカーは変更できない&lt;/li&gt;
+&lt;li&gt;優先度を変更できるのは、管理者のみ&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;列挙したフローから項目を作る&#34;&gt;列挙したフローから項目を作る&lt;/h2&gt;
+
+&lt;p&gt;列挙したフローから実際の項目を列挙する&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;トラッカー
+
+&lt;ul&gt;
+&lt;li&gt;作業&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ロール
+
+&lt;ul&gt;
+&lt;li&gt;管理者&lt;/li&gt;
+&lt;li&gt;開発者&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ステータス
+
+&lt;ul&gt;
+&lt;li&gt;新規&lt;/li&gt;
+&lt;li&gt;レビュー待ち&lt;/li&gt;
+&lt;li&gt;作業承認待ち&lt;/li&gt;
+&lt;li&gt;作業待ち&lt;/li&gt;
+&lt;li&gt;作業完了確認待ち&lt;/li&gt;
+&lt;li&gt;終了&lt;/li&gt;
+&lt;li&gt;レビューフィードバック&lt;/li&gt;
+&lt;li&gt;作業承認フィードバック&lt;/li&gt;
+&lt;li&gt;却下&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;ワークフロー
+
+&lt;ul&gt;
+&lt;li&gt;(実際に対応表作るしかないきがする)&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;実際に設定してみる&#34;&gt;実際に設定してみる&lt;/h2&gt;
+
+&lt;p&gt;トラッカーと、ロールと、ステータスを追加してワークフローを設定した。&lt;/p&gt;
+
+&lt;h3 id=&#34;開発者のワークフロー&#34;&gt;開発者のワークフロー&lt;/h3&gt;
+
+&lt;p&gt;フローの開発者が変更できるところを見ながら設定した。
+本当に使うときには、間違えてステータスを変更した時に戻せるようにするとかそういう設定がほしいかもしれない。&lt;/p&gt;
+
+&lt;p&gt;作成者と、担当者には特別に権限もつけられるようだった。
+ただ、作成者のみ権限を無効にすることはできなかった。
+ペアレビュー必須などの制限をかけることは難しそうだった。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/redmine001.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;管理者のワークフロー&#34;&gt;管理者のワークフロー&lt;/h3&gt;
+
+&lt;p&gt;管理者のワークフローも、さっき作ったフロー一覧をみながら設定した。
+&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/redmine002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;開発者が持っているパラメーターの権限&#34;&gt;開発者が持っているパラメーターの権限&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/redmine003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;やってみて思った事&#34;&gt;やってみて思った事&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;ワークフローの不備を見つけるのは大変そう。実際に運用してからある程度の期間は、カジュアルに設定を変えれるようにしないといけないかもしれない。&lt;/li&gt;
+&lt;li&gt;ワークフローの設定は redmine 管理者にしか見えない。実際にフローを回す人たちはどのステータスに遷移すれば終了に迎えるのかが見えない。複雑になったときはワークフローを説明するようなドキュメントは別途あったほうがよい。&lt;/li&gt;
+&lt;li&gt;グループ全員の合意が必要とか、指定の人数以上の合意が必要のようなルールは作れない。&lt;/li&gt;
+&lt;li&gt;ワークフローを作るのは、プロジェクトの管理者だとおもう。なのでそのあたりの権限はプロジェクト管理者に与えられるようにするべきではないかとも思った。すでに議論されているようだった。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>IPAM DCIM ツールの netbox を試してみる</title>

@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yomogitaro.github.io/article/post/2017-03-25_172109_redmine_workflow/</loc>
+    <lastmod>2017-03-25T17:21:09+09:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://yomogitaro.github.io/article/post/2017-03-19_195229/</loc>
     <lastmod>2017-03-19T19:52:30+09:00</lastmod>
   </url>
@@ -68,7 +73,7 @@
   
   <url>
     <loc>http://yomogitaro.github.io/article/post/</loc>
-    <lastmod>2017-03-19T19:52:30+09:00</lastmod>
+    <lastmod>2017-03-25T17:21:09+09:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -79,7 +84,7 @@
   
   <url>
     <loc>http://yomogitaro.github.io/article/</loc>
-    <lastmod>2017-03-19T19:52:30+09:00</lastmod>
+    <lastmod>2017-03-25T17:21:09+09:00</lastmod>
     <priority>0</priority>
   </url>
   

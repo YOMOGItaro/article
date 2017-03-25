@@ -67,69 +67,68 @@
 
 <p>そもそもどんなリポジトリを作っていたかも謎になっていたので、探すところからやった。
 cron で実行して通知するために、<code>DBUS_SESSION_BUS_ADDRESS</code>を探すところが苦労した。</p>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #75715e">#!/usr/bin/env zsh</span>
 
-<pre><code class="language-zsh">#!/usr/bin/env zsh
+<span style="color: #f8f8f2">SESSION_MANAGER</span><span style="color: #f92672">=</span>xfce4-session
+<span style="color: #f8f8f2">SCRIPT_NAME</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;yomogi-git-commit-reminder&quot;</span>
+<span style="color: #f8f8f2">NOTIFY_LIFE_TIME</span><span style="color: #f92672">=</span><span style="color: #ae81ff">5000</span>
 
-SESSION_MANAGER=xfce4-session
-SCRIPT_NAME=&quot;yomogi-git-commit-reminder&quot;
-NOTIFY_LIFE_TIME=5000
-
-function LIST_GIT_DIRS() {
-    find $HOME -xdev -type d -name .git 2&gt;/dev/null
-}
-
-
-function create_remind_reports() {
-    LINE=''
-    LIST_GIT_DIRS | while read git_dir
-    do
-        CHANGED_LINES=`git --git-dir=&quot;$git_dir&quot; --work-tree=&quot;$git_dir/..&quot; status --porcelain | wc -l`
-
-        if [ $CHANGED_LINES -gt 0 ]
-        then
-            LINE=$LINE&quot; `printf &quot;%05d&quot; $CHANGED_LINES` ${git_dir%/*} \n&quot;
-        fi
-    done
-
-    echo $LINE;
-}
+<span style="color: #66d9ef">function</span> LIST_GIT_DIRS<span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+    find <span style="color: #f8f8f2">$HOME</span> -xdev -type d -name .git <span style="color: #ae81ff">2</span>&gt;/dev/null
+<span style="color: #f92672">}</span>
 
 
-function output_report() {
-    if [ &quot;$VERBOSE&quot; = &quot;TRUE&quot; ]
-    then
-        echo $REPORTS
-    fi
+<span style="color: #66d9ef">function</span> create_remind_reports<span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+    <span style="color: #f8f8f2">LINE</span><span style="color: #f92672">=</span><span style="color: #e6db74">&#39;&#39;</span>
+    LIST_GIT_DIRS <span style="color: #f8f8f2">|</span> <span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">read</span> git_dir
+    <span style="color: #66d9ef">do</span>
+        <span style="color: #f8f8f2">CHANGED_LINES</span><span style="color: #f92672">=</span><span style="color: #e6db74">`</span>git --git-dir<span style="color: #f92672">=</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$git_dir</span><span style="color: #e6db74">&quot;</span> --work-tree<span style="color: #f92672">=</span><span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$git_dir</span><span style="color: #e6db74">/..&quot;</span> status --porcelain <span style="color: #f8f8f2">|</span> wc -l<span style="color: #e6db74">`</span>
 
-    if [ &quot;$NOTIFY&quot; = &quot;TRUE&quot; ]
-    then
-        PID=$(pgrep xfce4-session)
-        dbus=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
-        export DBUS_SESSION_BUS_ADDRESS=$dbus
+        <span style="color: #66d9ef">if</span> <span style="color: #f92672">[</span> <span style="color: #f8f8f2">$CHANGED_LINES</span> -gt <span style="color: #ae81ff">0</span> <span style="color: #f92672">]</span>
+        <span style="color: #66d9ef">then</span>
+            <span style="color: #f8f8f2">LINE</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">$LINE</span><span style="color: #e6db74">&quot; `printf &quot;</span>%05d<span style="color: #e6db74">&quot; </span><span style="color: #f8f8f2">$CHANGED_LINES</span><span style="color: #e6db74">` ${</span><span style="color: #f8f8f2">git_dir%/*</span><span style="color: #e6db74">} \n&quot;</span>
+        <span style="color: #66d9ef">fi</span>
+    <span style="color: #66d9ef">done</span>
 
-        /usr/bin/notify-send --urgency=low --expire-time=$NOTIFY_LIFE_TIME --category=git \
-                    --icon=$HOME/var/image/Git-Icon-White.png \
-                    'not commited git repos' $REPORTS
-    fi;
-}
+    <span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">$LINE;</span>
+<span style="color: #f92672">}</span>
 
 
-###
-# main section
-VERBOSE=&quot;TRUE&quot;
-while getopts nq OPT
-do
-    case $OPT in
-        &quot;n&quot; ) NOTIFY=&quot;TRUE&quot; ;;
-        &quot;q&quot; ) VERBOSE=&quot;FALSE&quot; ;;
-          * ) echo &quot;unexpected arg $OPT&quot;
-               exit 1;;
-    esac
-done
+<span style="color: #66d9ef">function</span> output_report<span style="color: #f92672">()</span> <span style="color: #f92672">{</span>
+    <span style="color: #66d9ef">if</span> <span style="color: #f92672">[</span> <span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$VERBOSE</span><span style="color: #e6db74">&quot;</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;TRUE&quot;</span> <span style="color: #f92672">]</span>
+    <span style="color: #66d9ef">then</span>
+        <span style="color: #f8f8f2">echo</span> <span style="color: #f8f8f2">$REPORTS</span>
+    <span style="color: #66d9ef">fi</span>
 
-REPORTS=`create_remind_reports`
-output_report &quot;$REPORTS&quot;
-</code></pre>
+    <span style="color: #66d9ef">if</span> <span style="color: #f92672">[</span> <span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$NOTIFY</span><span style="color: #e6db74">&quot;</span> <span style="color: #f92672">=</span> <span style="color: #e6db74">&quot;TRUE&quot;</span> <span style="color: #f92672">]</span>
+    <span style="color: #66d9ef">then</span>
+        <span style="color: #f8f8f2">PID</span><span style="color: #f92672">=</span><span style="color: #66d9ef">$(</span>pgrep xfce4-session<span style="color: #66d9ef">)</span>
+        <span style="color: #f8f8f2">dbus</span><span style="color: #f92672">=</span><span style="color: #66d9ef">$(</span>grep -z DBUS_SESSION_BUS_ADDRESS /proc/<span style="color: #f8f8f2">$PID</span>/environ<span style="color: #f8f8f2">|</span>cut -d<span style="color: #f92672">=</span> -f2-<span style="color: #66d9ef">)</span>
+        <span style="color: #f8f8f2">export</span> <span style="color: #f8f8f2">DBUS_SESSION_BUS_ADDRESS</span><span style="color: #f92672">=</span><span style="color: #f8f8f2">$dbus</span>
+
+        /usr/bin/notify-send --urgency<span style="color: #f92672">=</span>low --expire-time<span style="color: #f92672">=</span><span style="color: #f8f8f2">$NOTIFY_LIFE_TIME</span> --category<span style="color: #f92672">=</span>git <span style="color: #ae81ff">\</span>
+                    --icon<span style="color: #f92672">=</span><span style="color: #f8f8f2">$HOME</span>/var/image/Git-Icon-White.png <span style="color: #ae81ff">\</span>
+                    <span style="color: #e6db74">&#39;not commited git repos&#39;</span> <span style="color: #f8f8f2">$REPORTS</span>
+    <span style="color: #66d9ef">fi</span><span style="color: #f8f8f2">;</span>
+<span style="color: #f92672">}</span>
+
+
+<span style="color: #75715e">###</span>
+<span style="color: #75715e"># main section</span>
+<span style="color: #f8f8f2">VERBOSE</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;TRUE&quot;</span>
+<span style="color: #66d9ef">while</span> <span style="color: #f8f8f2">getopts</span> nq OPT
+<span style="color: #66d9ef">do</span>
+    <span style="color: #66d9ef">case</span> <span style="color: #f8f8f2">$OPT</span> in
+        <span style="color: #e6db74">&quot;n&quot;</span> <span style="color: #f92672">)</span> <span style="color: #f8f8f2">NOTIFY</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;TRUE&quot;</span> <span style="color: #f8f8f2">;;</span>
+        <span style="color: #e6db74">&quot;q&quot;</span> <span style="color: #f92672">)</span> <span style="color: #f8f8f2">VERBOSE</span><span style="color: #f92672">=</span><span style="color: #e6db74">&quot;FALSE&quot;</span> <span style="color: #f8f8f2">;;</span>
+          * <span style="color: #f92672">)</span> <span style="color: #f8f8f2">echo</span> <span style="color: #e6db74">&quot;unexpected arg </span><span style="color: #f8f8f2">$OPT</span><span style="color: #e6db74">&quot;</span>
+               <span style="color: #f8f8f2">exit</span> <span style="color: #ae81ff">1</span><span style="color: #f8f8f2">;;</span>
+    <span style="color: #66d9ef">esac</span>
+<span style="color: #66d9ef">done</span>
+
+<span style="color: #f8f8f2">REPORTS</span><span style="color: #f92672">=</span><span style="color: #e6db74">`</span>create_remind_reports<span style="color: #e6db74">`</span>
+output_report <span style="color: #e6db74">&quot;</span><span style="color: #f8f8f2">$REPORTS</span><span style="color: #e6db74">&quot;</span>
+</pre></div>
 
 <p>こんな感じで出てくる。</p>
 

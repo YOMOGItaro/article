@@ -100,23 +100,22 @@ IPAM 系は GET の API しか存在しなかった。</p>
 
 <p>golang の API クライアントの go-netbox を使ってみた。
 IP の一覧を取得するコードを適当に作った。</p>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #f92672">package</span> <span style="color: #a6e22e">main</span>
 
-<pre><code class="language-go">package main
+<span style="color: #f92672">import</span> <span style="color: #f8f8f2">(</span>
+    <span style="color: #e6db74">&quot;fmt&quot;</span>
+    <span style="color: #e6db74">&quot;github.com/digitalocean/go-netbox&quot;</span>
+<span style="color: #f8f8f2">)</span>
 
-import (
-    &quot;fmt&quot;
-    &quot;github.com/digitalocean/go-netbox&quot;
-)
-
-func main() {
-    c, _ := netbox.NewClient(&quot;http://localhost&quot;, nil);
-    ips, _ := c.IPAM.ListIPAddresses(nil)
-    for _, ip := range ips{
-        marshaled, _ := ip.MarshalJSON()
-        fmt.Println(string(marshaled));
-    }
-}
-</code></pre>
+<span style="color: #66d9ef">func</span> <span style="color: #a6e22e">main</span><span style="color: #f8f8f2">()</span> <span style="color: #f8f8f2">{</span>
+    <span style="color: #a6e22e">c</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">_</span> <span style="color: #f92672">:=</span> <span style="color: #a6e22e">netbox</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">NewClient</span><span style="color: #f8f8f2">(</span><span style="color: #e6db74">&quot;http://localhost&quot;</span><span style="color: #f8f8f2">,</span> <span style="color: #66d9ef">nil</span><span style="color: #f8f8f2">);</span>
+    <span style="color: #a6e22e">ips</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">_</span> <span style="color: #f92672">:=</span> <span style="color: #a6e22e">c</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">IPAM</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">ListIPAddresses</span><span style="color: #f8f8f2">(</span><span style="color: #66d9ef">nil</span><span style="color: #f8f8f2">)</span>
+    <span style="color: #66d9ef">for</span> <span style="color: #a6e22e">_</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">ip</span> <span style="color: #f92672">:=</span> <span style="color: #66d9ef">range</span> <span style="color: #a6e22e">ips</span><span style="color: #f8f8f2">{</span>
+        <span style="color: #a6e22e">marshaled</span><span style="color: #f8f8f2">,</span> <span style="color: #a6e22e">_</span> <span style="color: #f92672">:=</span> <span style="color: #a6e22e">ip</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">MarshalJSON</span><span style="color: #f8f8f2">()</span>
+        <span style="color: #a6e22e">fmt</span><span style="color: #f8f8f2">.</span><span style="color: #a6e22e">Println</span><span style="color: #f8f8f2">(string(</span><span style="color: #a6e22e">marshaled</span><span style="color: #f8f8f2">));</span>
+    <span style="color: #f8f8f2">}</span>
+<span style="color: #f8f8f2">}</span>
+</pre></div>
 
 <p>出力はこんな感じになる。</p>
 

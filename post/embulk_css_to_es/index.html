@@ -76,22 +76,19 @@
 <h2 id="テスト用-elasticsearch-の準備">テスト用 elasticsearch の準備　</h2>
 
 <p>elasticsearch を入れる</p>
-
-<pre><code class="language-zsh">% docker run -d --name es1 elasticsearch
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% docker run -d --name es1 elasticsearch
+</pre></div>
 
 <p>IP を確認して動いているか確認</p>
-
-<pre><code class="language-zsh">% docker inspect --format '{{ .NetworkSettings.IPAddress }}' es1
-% curl 'http://172.17.0.4:9200/_stats'
-{&quot;_shards&quot;:{&quot;total&quot;:0,&quot;successful&quot;:0,&quot;failed&quot;:0},&quot;_all&quot;:{&quot;primaries&quot;:{},&quot;total&quot;:{}},&quot;indices&quot;:{}}%
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% docker inspect --format <span style="color: #e6db74">&#39;{{ .NetworkSettings.IPAddress }}&#39;</span> es1
+% curl <span style="color: #e6db74">&#39;http://172.17.0.4:9200/_stats&#39;</span>
+<span style="color: #f92672">{</span><span style="color: #e6db74">&quot;_shards&quot;</span>:<span style="color: #f92672">{</span><span style="color: #e6db74">&quot;total&quot;</span>:0,<span style="color: #e6db74">&quot;successful&quot;</span>:0,<span style="color: #e6db74">&quot;failed&quot;</span>:0<span style="color: #f92672">}</span>,<span style="color: #e6db74">&quot;_all&quot;</span>:<span style="color: #f92672">{</span><span style="color: #e6db74">&quot;primaries&quot;</span>:<span style="color: #f92672">{}</span>,<span style="color: #e6db74">&quot;total&quot;</span>:<span style="color: #f92672">{}}</span>,<span style="color: #e6db74">&quot;indices&quot;</span>:<span style="color: #f92672">{}}</span>%
+</pre></div>
 
 <p>ドキュメントを UI から確認するために kibana も用意</p>
-
-<pre><code class="language-zsh">% docker run --link es1:elasticsearch -d --name kibana01 kibana
-% docker inspect --format '{{ .NetworkSettings.IPAddress }}' kibana01
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% docker run --link es1:elasticsearch -d --name kibana01 kibana
+% docker inspect --format <span style="color: #e6db74">&#39;{{ .NetworkSettings.IPAddress }}&#39;</span> kibana01
+</pre></div>
 
 <ul>
 <li><a href="http://172.17.0.6:5601">http://172.17.0.6:5601</a> 動いているか見てみる</li>
@@ -100,49 +97,43 @@
 <h2 id="embulk-のインストール">embulk のインストール</h2>
 
 <p>java が必要なので入れる</p>
-
-<pre><code class="language-zsh">% sudo apt-get install openjdk-8-jdk 
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% sudo apt-get install openjdk-8-jdk 
+</pre></div>
 
 <p><a href="https://github.com/embulk/embulk#linux--mac--bsd">ここ</a>に書いてあるとおりに入れてみる
 サンプルを動かしてみる</p>
-
-<pre><code class="language-zsh">% embulk example ./try1
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% embulk example ./try1
 % embulk guess ./try1/example.yml -o config.yml
 % embulk preview config.yml
 % embulk run config.yml
-</code></pre>
+</pre></div>
 
 <h2 id="embulk-elasticsearch-プラグインのインストール">embulk elasticsearch プラグインのインストール</h2>
 
 <p>elasticsearch の output-plugin をインストール</p>
-
-<pre><code class="language-zsh">% embulk gem install embulk-output-elasticsearch
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% embulk gem install embulk-output-elasticsearch
+</pre></div>
 
 <p>example を下記のように編集</p>
-
-<pre><code class="language-yaml">in:
-  type: file
-  path_prefix: &quot;/tmp/try1/csv/sample_&quot;
-out:
-  type: elasticsearch
-  nodes:
-  - {host: 172.17.0.4, port: 9300}
-index: embulk
-  index_type: embulk
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span><span style="color: #ae81ff">in</span><span style="color: #f8f8f2">:</span>
+  <span style="color: #ae81ff">type</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">file</span>
+  <span style="color: #ae81ff">path_prefix</span><span style="color: #f8f8f2">:</span> <span style="color: #e6db74">&quot;/tmp/try1/csv/sample_&quot;</span>
+<span style="color: #ae81ff">out</span><span style="color: #f8f8f2">:</span>
+  <span style="color: #ae81ff">type</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">elasticsearch</span>
+  <span style="color: #ae81ff">nodes</span><span style="color: #f8f8f2">:</span>
+  <span style="color: #f8f8f2">-</span> <span style="color: #f8f8f2">{host:</span> <span style="color: #f8f8f2">172.17.0.4,</span> <span style="color: #f8f8f2">port:</span> <span style="color: #f8f8f2">9300}</span>
+<span style="color: #ae81ff">index</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">embulk</span>
+  <span style="color: #ae81ff">index_type</span><span style="color: #f8f8f2">:</span> <span style="color: #ae81ff">embulk</span>
+</pre></div>
 
 <p>config 再生成して実行</p>
-
-<pre><code class="language-zsh">% embulk guess ./try1/example.yml -o config.yml
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>% embulk guess ./try1/example.yml -o config.yml
 % embulk run config.yml
-</code></pre>
+</pre></div>
 
 <p>うまくいっているか確認</p>
-
-<pre><code class="language-zsh">curl 'http://172.17.0.4:9200/embulk/_search' | jq .
-</code></pre>
+<div class="highlight" style="background: #272822"><pre style="line-height: 125%"><span></span>curl <span style="color: #e6db74">&#39;http://172.17.0.4:9200/embulk/_search&#39;</span> <span style="color: #f8f8f2">|</span> jq .
+</pre></div>
 
     </article>
     

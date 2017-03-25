@@ -261,23 +261,22 @@ IPAM 系は GET の API しか存在しなかった。&lt;/p&gt;
 
 &lt;p&gt;golang の API クライアントの go-netbox を使ってみた。
 IP の一覧を取得するコードを適当に作った。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;package&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;main&lt;/span&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;package main
+&lt;span style=&#34;color: #f92672&#34;&gt;import&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;
+    &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;fmt&amp;quot;&lt;/span&gt;
+    &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;github.com/digitalocean/go-netbox&amp;quot;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
 
-import (
-    &amp;quot;fmt&amp;quot;
-    &amp;quot;github.com/digitalocean/go-netbox&amp;quot;
-)
-
-func main() {
-    c, _ := netbox.NewClient(&amp;quot;http://localhost&amp;quot;, nil);
-    ips, _ := c.IPAM.ListIPAddresses(nil)
-    for _, ip := range ips{
-        marshaled, _ := ip.MarshalJSON()
-        fmt.Println(string(marshaled));
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;func&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;_&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;netbox&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;NewClient&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;http://localhost&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;nil&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color: #a6e22e&#34;&gt;ips&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;_&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;c&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;IPAM&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;ListIPAddresses&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;nil&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;for&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;_&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;ip&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;range&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;ips&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;marshaled&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;_&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color: #a6e22e&#34;&gt;ip&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;MarshalJSON&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;()&lt;/span&gt;
+        &lt;span style=&#34;color: #a6e22e&#34;&gt;fmt&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;Println&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(string(&lt;/span&gt;&lt;span style=&#34;color: #a6e22e&#34;&gt;marshaled&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;));&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;出力はこんな感じになる。&lt;/p&gt;
 
@@ -408,9 +407,8 @@ func main() {
       <description>
 
 &lt;p&gt;Emacs 25.1 から elisp 以外の言語で書かれたモジュールを読み込めるようになったらしい。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Emacs can now load shared/dynamic libraries (modules). A dynamic Emacs module is a shared library that provides additional functionality for use in Emacs Lisp programs, just like a package written in Emacs Lisp would.
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;Emacs can now load shared/dynamic libraries (modules). A dynamic Emacs module is a shared library that provides additional functionality for use in Emacs Lisp programs, just like a package written in Emacs Lisp would.
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;試してみる、ついでに evm を試したりする。&lt;/p&gt;
 
@@ -424,52 +422,45 @@ func main() {
 &lt;p&gt;&lt;a href=&#34;https://github.com/rejeep/evm&#34;&gt;https://github.com/rejeep/evm&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;readme の通り入れてみた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
-$ export PATH=&amp;quot;$HOME/.evm/bin:$PATH&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;$ curl -fsSkL https://raw.github.com/rejeep/evm/master/go &lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt; bash
+$ &lt;span style=&#34;color: #f8f8f2&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;PATH&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$HOME&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;/.evm/bin:&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$PATH&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;バージョンがあるか確認する。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;% evm list | grep 25.1
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% evm list &lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt; grep &lt;span style=&#34;color: #ae81ff&#34;&gt;25&lt;/span&gt;.1
 emacs-25.1
 emacs-25.1-travis
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;あった。&lt;/p&gt;
 
 &lt;p&gt;evm はデフォルトで &lt;code&gt;/usr/local/evm&lt;/code&gt; にファイルを作るようだったので設定を変更。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;% evm config path ~/evm
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% evm config path ~/evm
 % mkdir evm
 % evm install emacs-25.1
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;configure で失敗するらしい。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;checking for libXaw... configure: error: No X toolkit could be found.
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;checking for libXaw... configure: error: No X toolkit could be found.
 If you are sure you want Emacs compiled without an X toolkit, pass
   --with-x-toolkit=no
 to configure.  Otherwise, install the development libraries for the toolkit
 that you want to use (e.g. Gtk+) and re-run configure.
 Failed! See logs above for error.
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;この先いろんなライブラリが不足していると言われそうなのでとりあえず、 依存パッケージを落としておく。
 これがいいわけではないとおもう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ sudo apt-get build-dep emacs24
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;$ sudo apt-get build-dep emacs24
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;うまくコンパイルできた。
 バイナリで着ている。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ evm bin emacs-25.1
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;$ evm bin emacs-25.1
 /home/yourhome/evm/emacs-25.1/bin/emacs
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ evm use emacs-25.1
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;$ evm use emacs-25.1
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Emacs が 25.1 で起動できるようになった。&lt;/p&gt;
 
@@ -479,61 +470,56 @@ Failed! See logs above for error.
 &lt;a href=&#34;http://diobla.info/blog-archive/modules-tut.html&#34;&gt;http://diobla.info/blog-archive/modules-tut.html&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;code&gt;emacs-module.h&lt;/code&gt; を使うらしい。さっき evm に入って中に含まれるのでこれをつかう。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;$ cp /home/yourhome/evm/tmp/emacs-25.1/src/emacs-module.h ~/include/
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;$ cp /home/yourhome/evm/tmp/emacs-25.1/src/emacs-module.h ~/include/
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;サンプルの &lt;code&gt;mymod.c&lt;/code&gt; をコンパイルして &lt;code&gt;mymod.so&lt;/code&gt; を作って、 &lt;code&gt;(require &#39;mymod)&lt;/code&gt; したが下記のエラーがでて読み込まれなかった。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;Debugger entered--Lisp error: (file-error &amp;quot;Cannot open load file&amp;quot; &amp;quot;そのようなファイルやディレクトリはありません&amp;quot; &amp;quot;mymod&amp;quot;)
+&lt;pre&gt;&lt;code&gt;Debugger entered--Lisp error: (file-error &amp;quot;Cannot open load file&amp;quot; &amp;quot;そのようなファイルやディレクトリはありません&amp;quot; &amp;quot;mymod&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;&lt;code&gt;.el&lt;/code&gt;, &lt;code&gt;.elc&lt;/code&gt; しか読まれないようになっていそうだった。
 よく見たら Emacs のコンパイルで &lt;code&gt;configure&lt;/code&gt; の時に &lt;code&gt;--with-modules&lt;/code&gt; が必要そうだ。&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;--with-modules          compile with dynamic modules support
+&lt;pre&gt;&lt;code&gt;--with-modules          compile with dynamic modules support
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;evm でオプションを有効にしたレシピを作ってみた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;% diff -u ~/.evm/recipes/{emacs-25.1,emacs-25.1-with-modules}.rb
---- /home/yomogi/.evm/recipes/emacs-25.1.rb     2016-10-09 15:14:06.824971490 +0900
-+++ /home/yomogi/.evm/recipes/emacs-25.1-with-modules.rb        2016-10-10 10:46:54.497478153 +0900
-@@ -1,4 +1,4 @@
--recipe &#39;emacs-25.1&#39; do
-+recipe &#39;emacs-25.1-with-modules&#39; do
-   tar_xz &#39;http://ftpmirror.gnu.org/emacs/emacs-25.1.tar.gz&#39;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% diff -u ~/.evm/recipes/{emacs-25.1,emacs-25.1-with-modules}.rb
+&lt;span style=&#34;color: #f92672&#34;&gt;--- /home/yomogi/.evm/recipes/emacs-25.1.rb     2016-10-09 15:14:06.824971490 +0900&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;+++ /home/yomogi/.evm/recipes/emacs-25.1-with-modules.rb        2016-10-10 10:46:54.497478153 +0900&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;@@ -1,4 +1,4 @@&lt;/span&gt;
+&lt;span style=&#34;color: #f92672&#34;&gt;-recipe &amp;#39;emacs-25.1&amp;#39; do&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;+recipe &amp;#39;emacs-25.1-with-modules&amp;#39; do&lt;/span&gt;
+   tar_xz &amp;#39;http://ftpmirror.gnu.org/emacs/emacs-25.1.tar.gz&amp;#39;
 
    osx do
-@@ -12,6 +12,8 @@
-     option &#39;--without-gif&#39;
+&lt;span style=&#34;color: #75715e&#34;&gt;@@ -12,6 +12,8 @@&lt;/span&gt;
+     option &amp;#39;--without-gif&amp;#39;
    end
 
-+  option &#39;--with-modules&#39;
-+
+&lt;span style=&#34;color: #a6e22e&#34;&gt;+  option &amp;#39;--with-modules&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;+&lt;/span&gt;
    install do
      configure
-     make &#39;install&#39;
-&lt;/code&gt;&lt;/pre&gt;
+     make &amp;#39;install&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;ちゃんとたされたか確認してコンパイルして、設定。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;% evm list | grep emacs-25.1-with-modules
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% evm list &lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt; grep emacs-25.1-with-modules
 emacs-25.1-with-modules
 % evm install emacs-25.1-with-modules
 % evm use emacs-25.1-with-modules
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;起動して動作確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;% emacs -Q -L path/to/module
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code&gt;(require &#39;mymod)
-mymod
-(mymod-test)
-42
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% emacs -Q -L path/to/module
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;(require&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;mymod&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;mymod&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;(mymod-test)&lt;/span&gt;
+&lt;span style=&#34;color: #ae81ff&#34;&gt;42&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;うまく行った。&lt;/p&gt;
 
@@ -541,135 +527,131 @@ mymod
 
 &lt;p&gt;サンプルは、固定値を表示するだけの関数だったので、引数を取るような  plusone を作ってみる。モジュール名は tekito にする。
 どのような関数が用意されているかは &lt;a href=&#34;https://github.com/emacs-mirror/emacs/blob/emacs-25/src/emacs-module.h&#34;&gt;emacs-module.h&lt;/a&gt;, &lt;a href=&#34;https://github.com/emacs-mirror/emacs/blob/emacs-25/src/emacs-module.c&#34;&gt;emacs-module.c&lt;/a&gt; をみながら考えた。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;&amp;lt;emacs-module.h&amp;gt;&lt;/span&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-c&#34;&gt;#include &amp;lt;emacs-module.h&amp;gt;
-
-int plugin_is_GPL_compatible;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;plugin_is_GPL_compatible;&lt;/span&gt;
 
 
-const int PLUSONE_MAX_ARGS_NUM = 1;
-const int PLUSONE_MIN_ARGS_NUM = 1;
-const char * const PLUSONE_DOC_STRING = &amp;quot;doc&amp;quot;;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;PLUSONE_MAX_ARGS_NUM&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;PLUSONE_MIN_ARGS_NUM&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;char&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;PLUSONE_DOC_STRING&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;doc&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
 
-static
-emacs_value
-plusone
-(
- emacs_env * env,
- const int nargs,
- const emacs_value const args[],
- void * data
- )
-{
-  int val;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;static&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;plusone&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_env&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env,&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;nargs,&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;args[],&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;data&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;val;&lt;/span&gt;
 
-  val = env-&amp;gt;extract_integer(env, args[0]);
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;extract_integer(env,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;args[&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;]);&lt;/span&gt;
 
-  return env-&amp;gt;make_integer (env, val + 1);
-}
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;make_integer&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(env,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;val&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
 
-// fset を呼び出して、 name で Sfun が呼ばれるようにする関数
-// (fset &#39;{{name}} Sfun) をする
-static void
-fset
-(
- emacs_env * env,
- const char * const name,
- const emacs_value func_obj
- )
-{
-  static const int FSET_ARGS_NUM = 2;
-  emacs_value func_name = env-&amp;gt;intern (env, &amp;quot;fset&amp;quot;);
-  emacs_value func_args[] = { env-&amp;gt;intern (env, name), func_obj };
+&lt;span style=&#34;color: #75715e&#34;&gt;// fset を呼び出して、 name で Sfun が呼ばれるようにする関数&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;// (fset &amp;#39;{{name}} Sfun) をする&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;fset&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_env&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env,&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;char&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;name,&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_obj&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;FSET_ARGS_NUM&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_name&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;intern&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(env,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;fset&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_args[]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;intern&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(env,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;name),&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_obj&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
 
-  env-&amp;gt;funcall(
-                env,
-                func_name,
-                FSET_ARGS_NUM,
-                func_args
-               );
-}
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;funcall(&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;env,&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_name,&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;FSET_ARGS_NUM,&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_args&lt;/span&gt;
+               &lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
 
-// provide を呼び出す関数
-// (provide &#39;{{feature}}) をする
-static void
-provide
-(
- emacs_env *env,
- const char * const feature
- )
-{
-  static const int PROVIDE_ARGS_NUM = 1;
-  emacs_value func_name = env-&amp;gt;intern (env, &amp;quot;provide&amp;quot;);
-  emacs_value func_args[] = { env-&amp;gt;intern (env, feature) };
+&lt;span style=&#34;color: #75715e&#34;&gt;// provide を呼び出す関数&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;// (provide &amp;#39;{{feature}}) をする&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;void&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;provide&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_env&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;env,&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;char&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;feature&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;PROVIDE_ARGS_NUM&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_name&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;intern&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(env,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;provide&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_args[]&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;intern&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(env,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;feature)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;};&lt;/span&gt;
 
-  env-&amp;gt;funcall (
-                env,
-                func_name,
-                PROVIDE_ARGS_NUM,
-                func_args
-                );
-}
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;funcall&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;env,&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_name,&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;PROVIDE_ARGS_NUM,&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;func_args&lt;/span&gt;
+                &lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
 
-int
-emacs_module_init
-(
- struct emacs_runtime *ert
- )
-{
-  emacs_env * env = ert-&amp;gt;get_environment (ert);
-  emacs_value fun =
-    env-&amp;gt;make_function(
-                       env,
-                       PLUSONE_MIN_ARGS_NUM,
-                       PLUSONE_MAX_ARGS_NUM,
-                       (emacs_value (*)())plusone,
-                       PLUSONE_DOC_STRING,
-                       NULL // よくわかっていない
-  );
+&lt;span style=&#34;color: #66d9ef&#34;&gt;int&lt;/span&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;emacs_module_init&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;
+ &lt;span style=&#34;color: #66d9ef&#34;&gt;struct&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_runtime&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;ert&lt;/span&gt;
+ &lt;span style=&#34;color: #f8f8f2&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_env&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;ert&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;get_environment&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(ert);&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;fun&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;env&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;-&amp;gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;make_function(&lt;/span&gt;
+                       &lt;span style=&#34;color: #f8f8f2&#34;&gt;env,&lt;/span&gt;
+                       &lt;span style=&#34;color: #f8f8f2&#34;&gt;PLUSONE_MIN_ARGS_NUM,&lt;/span&gt;
+                       &lt;span style=&#34;color: #f8f8f2&#34;&gt;PLUSONE_MAX_ARGS_NUM,&lt;/span&gt;
+                       &lt;span style=&#34;color: #f8f8f2&#34;&gt;(emacs_value&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;)())plusone,&lt;/span&gt;
+                       &lt;span style=&#34;color: #f8f8f2&#34;&gt;PLUSONE_DOC_STRING,&lt;/span&gt;
+                       &lt;span style=&#34;color: #f8f8f2&#34;&gt;NULL&lt;/span&gt; &lt;span style=&#34;color: #75715e&#34;&gt;// よくわかっていない&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
 
-  fset(env, &amp;quot;plusone&amp;quot;, fun);
-  provide (env, &amp;quot;tekito&amp;quot;);
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;fset(env,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;plusone&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;fun);&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;provide&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;(env,&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;tekito&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;);&lt;/span&gt;
 
-  return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
+  &lt;span style=&#34;color: #66d9ef&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Makefile はこんな感じ&lt;/p&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;LIBRARY&lt;/span&gt;    &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;HOME&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt;/include
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;CC&lt;/span&gt;      &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; gcc
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;LD&lt;/span&gt;      &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; gcc
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;CFLAGS&lt;/span&gt;  &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; -ggdb3 -Wall
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;LDFLAGS&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-makefile&#34;&gt;LIBRARY    = $(HOME)/include
-CC      = gcc
-LD      = gcc
-CFLAGS  = -ggdb3 -Wall
-LDFLAGS =
+&lt;span style=&#34;color: #a6e22e&#34;&gt;all&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;tekito&lt;/span&gt;.&lt;span style=&#34;color: #f8f8f2&#34;&gt;so&lt;/span&gt;
 
-all: tekito.so
+&lt;span style=&#34;color: #a6e22e&#34;&gt;%.so&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; %.&lt;span style=&#34;color: #f8f8f2&#34;&gt;o&lt;/span&gt;
+	&lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;LD&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt; -shared &lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;LDFLAGS&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt; -o &lt;span style=&#34;color: #f8f8f2&#34;&gt;$@&lt;/span&gt; $&amp;lt;
 
-%.so: %.o
-	$(LD) -shared $(LDFLAGS) -o $@ $&amp;lt;
-
-%.o: %.c
-	$(CC) $(CFLAGS) -I$(LIBRARY) -fPIC -c $&amp;lt;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;%.o&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;:&lt;/span&gt; %.&lt;span style=&#34;color: #f8f8f2&#34;&gt;c&lt;/span&gt;
+	&lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;CC&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;CFLAGS&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt; -I&lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;LIBRARY&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt; -fPIC -c $&amp;lt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;Emacs で動作を試してみた。うまく動いた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;emacs -Q -L &amp;quot;${HOME}/Programs/sandbox/20161010/&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;emacs -Q -L &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;${&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;HOME&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;}/Programs/sandbox/20161010/&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;scratch バッファでいろいろ。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-md&#34;&gt;(require &#39;tekito)
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;(require &amp;#39;tekito)
 tekito
 (plusone 15)
 16
-(require &#39;tekito)
+(require &amp;#39;tekito)
 tekito
 (plusone 5)
 6
 (plusone -2000)
 -1999
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h1 id=&#34;まとめ&#34;&gt;まとめ&lt;/h1&gt;
 
@@ -1221,69 +1203,68 @@ apt だと 0.2 が入ってしまうので、  github から入れる。 0.9 を
 
 &lt;p&gt;そもそもどんなリポジトリを作っていたかも謎になっていたので、探すところからやった。
 cron で実行して通知するために、&lt;code&gt;DBUS_SESSION_BUS_ADDRESS&lt;/code&gt;を探すところが苦労した。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #75715e&#34;&gt;#!/usr/bin/env zsh&lt;/span&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;#!/usr/bin/env zsh
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;SESSION_MANAGER&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;xfce4-session
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;SCRIPT_NAME&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;yomogi-git-commit-reminder&amp;quot;&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;NOTIFY_LIFE_TIME&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;5000&lt;/span&gt;
 
-SESSION_MANAGER=xfce4-session
-SCRIPT_NAME=&amp;quot;yomogi-git-commit-reminder&amp;quot;
-NOTIFY_LIFE_TIME=5000
-
-function LIST_GIT_DIRS() {
-    find $HOME -xdev -type d -name .git 2&amp;gt;/dev/null
-}
-
-
-function create_remind_reports() {
-    LINE=&#39;&#39;
-    LIST_GIT_DIRS | while read git_dir
-    do
-        CHANGED_LINES=`git --git-dir=&amp;quot;$git_dir&amp;quot; --work-tree=&amp;quot;$git_dir/..&amp;quot; status --porcelain | wc -l`
-
-        if [ $CHANGED_LINES -gt 0 ]
-        then
-            LINE=$LINE&amp;quot; `printf &amp;quot;%05d&amp;quot; $CHANGED_LINES` ${git_dir%/*} \n&amp;quot;
-        fi
-    done
-
-    echo $LINE;
-}
+&lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt; LIST_GIT_DIRS&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+    find &lt;span style=&#34;color: #f8f8f2&#34;&gt;$HOME&lt;/span&gt; -xdev -type d -name .git &lt;span style=&#34;color: #ae81ff&#34;&gt;2&lt;/span&gt;&amp;gt;/dev/null
+&lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
 
 
-function output_report() {
-    if [ &amp;quot;$VERBOSE&amp;quot; = &amp;quot;TRUE&amp;quot; ]
-    then
-        echo $REPORTS
-    fi
+&lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt; create_remind_reports&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;LINE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;&amp;#39;&lt;/span&gt;
+    LIST_GIT_DIRS &lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt; &lt;span style=&#34;color: #66d9ef&#34;&gt;while&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;read&lt;/span&gt; git_dir
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;CHANGED_LINES&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;`&lt;/span&gt;git --git-dir&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$git_dir&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt; --work-tree&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$git_dir&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;/..&amp;quot;&lt;/span&gt; status --porcelain &lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt; wc -l&lt;span style=&#34;color: #e6db74&#34;&gt;`&lt;/span&gt;
 
-    if [ &amp;quot;$NOTIFY&amp;quot; = &amp;quot;TRUE&amp;quot; ]
-    then
-        PID=$(pgrep xfce4-session)
-        dbus=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
-        export DBUS_SESSION_BUS_ADDRESS=$dbus
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;$CHANGED_LINES&lt;/span&gt; -gt &lt;span style=&#34;color: #ae81ff&#34;&gt;0&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;]&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;then&lt;/span&gt;
+            &lt;span style=&#34;color: #f8f8f2&#34;&gt;LINE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$LINE&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot; `printf &amp;quot;&lt;/span&gt;%05d&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot; &lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$CHANGED_LINES&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;` ${&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;git_dir%/*&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;} \n&amp;quot;&lt;/span&gt;
+        &lt;span style=&#34;color: #66d9ef&#34;&gt;fi&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;done&lt;/span&gt;
 
-        /usr/bin/notify-send --urgency=low --expire-time=$NOTIFY_LIFE_TIME --category=git \
-                    --icon=$HOME/var/image/Git-Icon-White.png \
-                    &#39;not commited git repos&#39; $REPORTS
-    fi;
-}
+    &lt;span style=&#34;color: #f8f8f2&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;$LINE;&lt;/span&gt;
+&lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
 
 
-###
-# main section
-VERBOSE=&amp;quot;TRUE&amp;quot;
-while getopts nq OPT
-do
-    case $OPT in
-        &amp;quot;n&amp;quot; ) NOTIFY=&amp;quot;TRUE&amp;quot; ;;
-        &amp;quot;q&amp;quot; ) VERBOSE=&amp;quot;FALSE&amp;quot; ;;
-          * ) echo &amp;quot;unexpected arg $OPT&amp;quot;
-               exit 1;;
-    esac
-done
+&lt;span style=&#34;color: #66d9ef&#34;&gt;function&lt;/span&gt; output_report&lt;span style=&#34;color: #f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$VERBOSE&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;TRUE&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;]&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;then&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;$REPORTS&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;fi&lt;/span&gt;
 
-REPORTS=`create_remind_reports`
-output_report &amp;quot;$REPORTS&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;[&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$NOTIFY&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;TRUE&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;]&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;then&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;PID&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;pgrep xfce4-session&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;dbus&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #66d9ef&#34;&gt;$(&lt;/span&gt;grep -z DBUS_SESSION_BUS_ADDRESS /proc/&lt;span style=&#34;color: #f8f8f2&#34;&gt;$PID&lt;/span&gt;/environ&lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt;cut -d&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt; -f2-&lt;span style=&#34;color: #66d9ef&#34;&gt;)&lt;/span&gt;
+        &lt;span style=&#34;color: #f8f8f2&#34;&gt;export&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;DBUS_SESSION_BUS_ADDRESS&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$dbus&lt;/span&gt;
+
+        /usr/bin/notify-send --urgency&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;low --expire-time&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$NOTIFY_LIFE_TIME&lt;/span&gt; --category&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;git &lt;span style=&#34;color: #ae81ff&#34;&gt;\&lt;/span&gt;
+                    --icon&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$HOME&lt;/span&gt;/var/image/Git-Icon-White.png &lt;span style=&#34;color: #ae81ff&#34;&gt;\&lt;/span&gt;
+                    &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;not commited git repos&amp;#39;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;$REPORTS&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;fi&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;
+
+
+&lt;span style=&#34;color: #75715e&#34;&gt;###&lt;/span&gt;
+&lt;span style=&#34;color: #75715e&#34;&gt;# main section&lt;/span&gt;
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;VERBOSE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;TRUE&amp;quot;&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;while&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;getopts&lt;/span&gt; nq OPT
+&lt;span style=&#34;color: #66d9ef&#34;&gt;do&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;$OPT&lt;/span&gt; in
+        &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;n&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;NOTIFY&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;TRUE&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;;;&lt;/span&gt;
+        &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;q&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;VERBOSE&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;FALSE&amp;quot;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;;;&lt;/span&gt;
+          * &lt;span style=&#34;color: #f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;echo&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;unexpected arg &lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$OPT&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;
+               &lt;span style=&#34;color: #f8f8f2&#34;&gt;exit&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;;;&lt;/span&gt;
+    &lt;span style=&#34;color: #66d9ef&#34;&gt;esac&lt;/span&gt;
+&lt;span style=&#34;color: #66d9ef&#34;&gt;done&lt;/span&gt;
+
+&lt;span style=&#34;color: #f8f8f2&#34;&gt;REPORTS&lt;/span&gt;&lt;span style=&#34;color: #f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;`&lt;/span&gt;create_remind_reports&lt;span style=&#34;color: #e6db74&#34;&gt;`&lt;/span&gt;
+output_report &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;$REPORTS&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;こんな感じで出てくる。&lt;/p&gt;
 
@@ -1395,22 +1376,19 @@ sudo apt-get update
 &lt;h2 id=&#34;テスト用-elasticsearch-の準備&#34;&gt;テスト用 elasticsearch の準備　&lt;/h2&gt;
 
 &lt;p&gt;elasticsearch を入れる&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% docker run -d --name es1 elasticsearch
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% docker run -d --name es1 elasticsearch
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;IP を確認して動いているか確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; es1
-% curl &#39;http://172.17.0.4:9200/_stats&#39;
-{&amp;quot;_shards&amp;quot;:{&amp;quot;total&amp;quot;:0,&amp;quot;successful&amp;quot;:0,&amp;quot;failed&amp;quot;:0},&amp;quot;_all&amp;quot;:{&amp;quot;primaries&amp;quot;:{},&amp;quot;total&amp;quot;:{}},&amp;quot;indices&amp;quot;:{}}%
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% docker inspect --format &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;{{ .NetworkSettings.IPAddress }}&amp;#39;&lt;/span&gt; es1
+% curl &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;http://172.17.0.4:9200/_stats&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;_shards&amp;quot;&lt;/span&gt;:&lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;total&amp;quot;&lt;/span&gt;:0,&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;successful&amp;quot;&lt;/span&gt;:0,&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;failed&amp;quot;&lt;/span&gt;:0&lt;span style=&#34;color: #f92672&#34;&gt;}&lt;/span&gt;,&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;_all&amp;quot;&lt;/span&gt;:&lt;span style=&#34;color: #f92672&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;primaries&amp;quot;&lt;/span&gt;:&lt;span style=&#34;color: #f92672&#34;&gt;{}&lt;/span&gt;,&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;total&amp;quot;&lt;/span&gt;:&lt;span style=&#34;color: #f92672&#34;&gt;{}}&lt;/span&gt;,&lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;indices&amp;quot;&lt;/span&gt;:&lt;span style=&#34;color: #f92672&#34;&gt;{}}&lt;/span&gt;%
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;ドキュメントを UI から確認するために kibana も用意&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% docker run --link es1:elasticsearch -d --name kibana01 kibana
-% docker inspect --format &#39;{{ .NetworkSettings.IPAddress }}&#39; kibana01
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% docker run --link es1:elasticsearch -d --name kibana01 kibana
+% docker inspect --format &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;{{ .NetworkSettings.IPAddress }}&amp;#39;&lt;/span&gt; kibana01
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://172.17.0.6:5601&#34;&gt;http://172.17.0.6:5601&lt;/a&gt; 動いているか見てみる&lt;/li&gt;
@@ -1419,49 +1397,43 @@ sudo apt-get update
 &lt;h2 id=&#34;embulk-のインストール&#34;&gt;embulk のインストール&lt;/h2&gt;
 
 &lt;p&gt;java が必要なので入れる&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% sudo apt-get install openjdk-8-jdk 
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% sudo apt-get install openjdk-8-jdk 
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://github.com/embulk/embulk#linux--mac--bsd&#34;&gt;ここ&lt;/a&gt;に書いてあるとおりに入れてみる
 サンプルを動かしてみる&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% embulk example ./try1
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% embulk example ./try1
 % embulk guess ./try1/example.yml -o config.yml
 % embulk preview config.yml
 % embulk run config.yml
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;h2 id=&#34;embulk-elasticsearch-プラグインのインストール&#34;&gt;embulk elasticsearch プラグインのインストール&lt;/h2&gt;
 
 &lt;p&gt;elasticsearch の output-plugin をインストール&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% embulk gem install embulk-output-elasticsearch
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% embulk gem install embulk-output-elasticsearch
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;example を下記のように編集&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-yaml&#34;&gt;in:
-  type: file
-  path_prefix: &amp;quot;/tmp/try1/csv/sample_&amp;quot;
-out:
-  type: elasticsearch
-  nodes:
-  - {host: 172.17.0.4, port: 9300}
-index: embulk
-  index_type: embulk
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;span style=&#34;color: #ae81ff&#34;&gt;in&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt;
+  &lt;span style=&#34;color: #ae81ff&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;file&lt;/span&gt;
+  &lt;span style=&#34;color: #ae81ff&#34;&gt;path_prefix&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;quot;/tmp/try1/csv/sample_&amp;quot;&lt;/span&gt;
+&lt;span style=&#34;color: #ae81ff&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt;
+  &lt;span style=&#34;color: #ae81ff&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;elasticsearch&lt;/span&gt;
+  &lt;span style=&#34;color: #ae81ff&#34;&gt;nodes&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt;
+  &lt;span style=&#34;color: #f8f8f2&#34;&gt;-&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;{host:&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;172.17.0.4,&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;port:&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;9300}&lt;/span&gt;
+&lt;span style=&#34;color: #ae81ff&#34;&gt;index&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;embulk&lt;/span&gt;
+  &lt;span style=&#34;color: #ae81ff&#34;&gt;index_type&lt;/span&gt;&lt;span style=&#34;color: #f8f8f2&#34;&gt;:&lt;/span&gt; &lt;span style=&#34;color: #ae81ff&#34;&gt;embulk&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;config 再生成して実行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;% embulk guess ./try1/example.yml -o config.yml
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;% embulk guess ./try1/example.yml -o config.yml
 % embulk run config.yml
-&lt;/code&gt;&lt;/pre&gt;
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;うまくいっているか確認&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;curl &#39;http://172.17.0.4:9200/embulk/_search&#39; | jq .
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;curl &lt;span style=&#34;color: #e6db74&#34;&gt;&amp;#39;http://172.17.0.4:9200/embulk/_search&amp;#39;&lt;/span&gt; &lt;span style=&#34;color: #f8f8f2&#34;&gt;|&lt;/span&gt; jq .
+&lt;/pre&gt;&lt;/div&gt;
 </description>
     </item>
     
@@ -1508,10 +1480,9 @@ public ディレクトリを gh-pages にした。&lt;/p&gt;
 &lt;h2 id=&#34;go-インストール後パスを通したのに-go-がないと言われる&#34;&gt;go インストール後パスを通したのに go がないと言われる&lt;/h2&gt;
 
 &lt;p&gt;go を実行したら下記のようなメッセージが出てきた。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-zsh&#34;&gt;$ go
-zsh: no such file or directory: {{go のパス}}/go
-&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;$ go
+zsh: no such file or directory: &lt;span style=&#34;color: #f92672&#34;&gt;{{&lt;/span&gt;go のパス&lt;span style=&#34;color: #f92672&#34;&gt;}}&lt;/span&gt;/go
+&lt;/pre&gt;&lt;/div&gt;
 
 &lt;p&gt;下記を見なおしたが問題が無かった。&lt;/p&gt;
 
@@ -1528,9 +1499,19 @@ zsh: no such file or directory: {{go のパス}}/go
 
 &lt;h2 id=&#34;hugo-テーマがうまく当たらない&#34;&gt;hugo テーマがうまく当たらない&lt;/h2&gt;
 
-&lt;p&gt;hugo のテーマがうまく当たらなかった。
+&lt;p&gt;&lt;del&gt;dddddhugo のテーマがうまく当たらなかった。
 サイトのパスのトップに css や js がないとうまく動かなかった。
-パスを設定できるようにして当たるようにした。&lt;/p&gt;
+パスを設定できるようにして当たるようにした。&lt;/del&gt;&lt;/p&gt;
+
+&lt;p&gt;(2017/03/25 修正)&lt;/p&gt;
+
+&lt;p&gt;サイトのパスにサブディレクトリを含み、コンテンツをサブディレクトリ以下に置くときには、&lt;code&gt;config.toml&lt;/code&gt; に &lt;code&gt;CanonifyUrls&lt;/code&gt; を設定しないといけなかった。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34; style=&#34;background: #272822&#34;&gt;&lt;pre style=&#34;line-height: 125%&#34;&gt;&lt;span&gt;&lt;/span&gt;  baseurl = &amp;quot;http://yomogitaro.github.io/article&amp;quot;
+&lt;span style=&#34;color: #a6e22e&#34;&gt;+ canonifyurls=true&lt;/span&gt;
+  languageCode = &amp;quot;ja&amp;quot;
+  title = &amp;quot;よもぎさんのへや&amp;quot;
+  pygmentscodefences = true
+&lt;/pre&gt;&lt;/div&gt;
 </description>
     </item>
     

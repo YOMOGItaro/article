@@ -15,15 +15,15 @@
 
 
   
-  <link rel="stylesheet" href="/article/css/sanitize.css">
-  <link rel="stylesheet" href="/article/css/responsive.css">
-  <link rel="stylesheet" HREF="/article/css/highlight_monokai.css">
-  <link rel="stylesheet/less" href="/article/css/theme.less">
-  <link rel="stylesheet" href="/article/css/custom.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/sanitize.css">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/responsive.css">
+  <link rel="stylesheet" HREF="/css/highlight_monokai.css">
+  <link rel="stylesheet/less" href="http://yomogitaro.github.io/article/css/theme.less">
+  <link rel="stylesheet" href="http://yomogitaro.github.io/article/css/custom.css">
 
 
   
-  <script src="/article/js/less.js" type="text/javascript"></script>
+  <script src="http://yomogitaro.github.io/article/js/less.js" type="text/javascript"></script>
 
 
 </head>
@@ -37,7 +37,7 @@
   <header role="banner">
     <div class="row gutters">
       <div id="site-title" class="col span_6">
-        <h1><a href="/article/">よもぎさんのへや</a></h1>
+        <h1><a href="http://yomogitaro.github.io/article/">よもぎさんのへや</a></h1>
         <h2>たなからくさだいふく</h2>
       </div>
       <div id="social" class="col span_6">
@@ -121,34 +121,34 @@ sysctl で書き換える。</p>
 </code></pre>
 
 <p>kibana 開いてみたら自分が見慣れていた色と違う色使いの画面が出てきて戸惑った。
-<img src="/article/images/kibana001.png" alt="" /></p>
+<img src="http://yomogitaro.github.io/article/images/kibana001.png" alt="" /></p>
 
 <p>Upload CSV とか書いてあった。 1GB までの CSV ならアップロードできるみたい。
-<img src="/article/images/kibana002.png" alt="" /></p>
+<img src="http://yomogitaro.github.io/article/images/kibana002.png" alt="" /></p>
 
 <p>気になったので少し脱線してやってみた。
 統計庁から適当な csv 持ってきていれてみた。
 <a href="http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&amp;cycode=0">http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&amp;cycode=0</a></p>
 
-<p><img src="/article/images/kibana003.png" alt="" /></p>
+<p><img src="http://yomogitaro.github.io/article/images/kibana003.png" alt="" /></p>
 
 <p>先頭行がフィールド名として扱われた。デリミタはタブ、スペース、セミコロン、パイプも指定できる。
 適当に整形した。</p>
 
-<p><img src="/article/images/kibana004.png" alt="" /></p>
+<p><img src="http://yomogitaro.github.io/article/images/kibana004.png" alt="" /></p>
 
 <p>各フィールドの型は決められるみたいだった。
 事前に時間を表すフィールドは date 型に変換できるように整形したほうが良さそうだった。
 今回は <code>199901</code> を <code>1999-01</code> に事前に修正すればよかった。
 インデックス名もここで決められた。</p>
 
-<p><img src="/article/images/kibana005.png" alt="" /></p>
+<p><img src="http://yomogitaro.github.io/article/images/kibana005.png" alt="" /></p>
 
 <p>無事アップロードできた。
-<img src="/article/images/kibana006.png" alt="" /></p>
+<img src="http://yomogitaro.github.io/article/images/kibana006.png" alt="" /></p>
 
 <p>飲み物の消費者物価指数推移とかが作れた。
-<img src="/article/images/kibana007.png" alt="" />
+<img src="http://yomogitaro.github.io/article/images/kibana007.png" alt="" />
 どうでも良いことだが、物価指数は基準の月を 100 とした時の、
 比較を表しているものらしかった。</p>
 
@@ -404,7 +404,7 @@ stored にすると source を変換した値が入ることがあるようだ�
 </code></pre>
 
 <p>kibana でも統一されたフォーマットで表示されるようになった。
-<img src="/article/images/kibana008.png" alt="" /></p>
+<img src="http://yomogitaro.github.io/article/images/kibana008.png" alt="" /></p>
 
 <h2 id="感想">感想</h2>
 
@@ -453,7 +453,7 @@ stored にすると source を変換した値が入ることがあるようだ�
 
 </div>
 
-<script src="/article/js/highlight.pack.js"></script>
+<script src="http://yomogitaro.github.io/article/js/highlight.pack.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 
 

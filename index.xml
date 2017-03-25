@@ -194,16 +194,16 @@ Adminstrator でしか追加できない項目をお願いすれば良い。&lt;
 ただ、作成者のみ権限を無効にすることはできなかった。
 ペアレビュー必須などの制限をかけることは難しそうだった。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/redmine001.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/redmine001.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;管理者のワークフロー&#34;&gt;管理者のワークフロー&lt;/h3&gt;
 
 &lt;p&gt;管理者のワークフローも、さっき作ったフロー一覧をみながら設定した。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/redmine002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/redmine002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;開発者が持っているパラメーターの権限&#34;&gt;開発者が持っているパラメーターの権限&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/redmine003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/redmine003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h1 id=&#34;やってみて思った事&#34;&gt;やってみて思った事&lt;/h1&gt;
 
@@ -234,7 +234,7 @@ Adminstrator でしか追加できない項目をお願いすれば良い。&lt;
 
 &lt;p&gt;ログインするとダッシュボード画面が出てくる。
 地域を管理する機能、DCIMとしての機能、IPAMとしての機能、エンドポイント間のリンクを管理する機能、パスワードなどの機密情報を管理する機能で分かれている。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;DCIM は使ったことがないので何ができると良いのかはよくわかっていない。
 機器の配置を決めてラック図を作ったり、
@@ -293,51 +293,51 @@ func main() {
 
 &lt;h4 id=&#34;ipam-は-get-系の-api-しかなくて残念&#34;&gt;IPAM は GET 系の API しかなくて残念&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox001.png&#34; alt=&#34;GET 系の API しかなくて残念の図&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox001.png&#34; alt=&#34;GET 系の API しかなくて残念の図&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;ラック図がみれる&#34;&gt;ラック図がみれる&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;ある-site-の-ip-を一つ取ろうと思った時の操作&#34;&gt;ある Site の IP を一つ取ろうと思った時の操作&lt;/h3&gt;
 
 &lt;h4 id=&#34;site-を選んで&#34;&gt;Site を選んで、&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox004.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox004.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;prefix-を選んで&#34;&gt;Prefix を選んで、&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox005.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox005.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;add-ip-を押して&#34;&gt;Add IP を押して、&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox006.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox006.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;ip-を取る&#34;&gt;IP を取る&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox007.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox007.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;追加する-ip-は-複数同時に指定したりできる&#34;&gt;追加する IP は、複数同時に指定したりできる&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox008.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox008.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;csv-形式で大量に追加することもできる&#34;&gt;csv 形式で大量に追加することもできる&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox009.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox009.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;extra-を試した&#34;&gt;Extra を試した&lt;/h3&gt;
 
 &lt;h4 id=&#34;custom-field-追加&#34;&gt;Custom Field 追加&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox010.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox010.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;custom-field-ができた&#34;&gt;Custom Field ができた&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox011.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox011.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;export-template-追加&#34;&gt;Export Template 追加&lt;/h4&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/netbox012.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/netbox012.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&#34;export-template-出力&#34;&gt;Export Template 出力&lt;/h4&gt;
 
@@ -752,34 +752,34 @@ sysctl で書き換える。&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;kibana 開いてみたら自分が見慣れていた色と違う色使いの画面が出てきて戸惑った。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana001.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana001.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Upload CSV とか書いてあった。 1GB までの CSV ならアップロードできるみたい。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana002.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;気になったので少し脱線してやってみた。
 統計庁から適当な csv 持ってきていれてみた。
 &lt;a href=&#34;http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&amp;amp;cycode=0&#34;&gt;http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&amp;amp;cycode=0&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana003.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;先頭行がフィールド名として扱われた。デリミタはタブ、スペース、セミコロン、パイプも指定できる。
 適当に整形した。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana004.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana004.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;各フィールドの型は決められるみたいだった。
 事前に時間を表すフィールドは date 型に変換できるように整形したほうが良さそうだった。
 今回は &lt;code&gt;199901&lt;/code&gt; を &lt;code&gt;1999-01&lt;/code&gt; に事前に修正すればよかった。
 インデックス名もここで決められた。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana005.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana005.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;無事アップロードできた。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana006.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana006.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;飲み物の消費者物価指数推移とかが作れた。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana007.png&#34; alt=&#34;&#34; /&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana007.png&#34; alt=&#34;&#34; /&gt;
 どうでも良いことだが、物価指数は基準の月を 100 とした時の、
 比較を表しているものらしかった。&lt;/p&gt;
 
@@ -1035,7 +1035,7 @@ stored にすると source を変換した値が入ることがあるようだ�
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;kibana でも統一されたフォーマットで表示されるようになった。
-&lt;img src=&#34;http://yomogitaro.github.io/article/article/images/kibana008.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;http://yomogitaro.github.io/article/images/kibana008.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;感想&#34;&gt;感想&lt;/h2&gt;
 
@@ -1500,7 +1500,7 @@ public ディレクトリを gh-pages にした。&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;http://gohugo.io/overview/introduction/&#34;&gt;http://gohugo.io/overview/introduction/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://help.github.com/articles/user-organization-and-project-pages/#project-pages&#34;&gt;https://help.github.com/articles/user-organization-and-project-pages/#project-pages&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://help.github.coms/user-organization-and-project-pages/#project-pages&#34;&gt;https://help.github.coms/user-organization-and-project-pages/#project-pages&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h1 id=&#34;構築中に詰まったところ&#34;&gt;構築中に詰まったところ&lt;/h1&gt;

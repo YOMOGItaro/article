@@ -51,6 +51,18 @@ zsh: no such file or directory: {{go のパス}}/go
 
 ## hugo テーマがうまく当たらない ##
 
-hugo のテーマがうまく当たらなかった。
+~~dddddhugo のテーマがうまく当たらなかった。
 サイトのパスのトップに css や js がないとうまく動かなかった。
-パスを設定できるようにして当たるようにした。
+パスを設定できるようにして当たるようにした。~~
+
+(2017/03/25 修正)
+
+サイトのパスにサブディレクトリを含み、コンテンツをサブディレクトリ以下に置くときには、`config.toml` に `CanonifyUrls` を設定しないといけなかった。
+
+``` diff
+  baseurl = "http://yomogitaro.github.io/article"
++ canonifyurls=true
+  languageCode = "ja"
+  title = "よもぎさんのへや"
+  pygmentscodefences = true
+```

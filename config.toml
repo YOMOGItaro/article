@@ -1,4 +1,5 @@
-baseurl = "http://yomogitaro.github.io/article/"
+baseurl = "http://yomogitaro.github.io/article"
+CanonifyUrls=true
 languageCode = "ja"
 title = "よもぎさんのへや"
 

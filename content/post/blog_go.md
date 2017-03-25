@@ -27,7 +27,7 @@ public ディレクトリを gh-pages にした。
 主に下記のサイトを参考にした。
 
 * http://gohugo.io/overview/introduction/
-* https://help.github.com/articles/user-organization-and-project-pages/#project-pages
+* https://help.github.coms/user-organization-and-project-pages/#project-pages
 
 # 構築中に詰まったところ #
 

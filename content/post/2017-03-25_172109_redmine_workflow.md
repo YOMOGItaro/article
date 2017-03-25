@@ -97,15 +97,15 @@ Administrator 以外でもできる操作を簡単に調べてみたら、
 ただ、作成者のみ権限を無効にすることはできなかった。
 ペアレビュー必須などの制限をかけることは難しそうだった。
 
-![](/article/images/redmine001.png)
+![](/images/redmine001.png)
 
 ### 管理者のワークフロー
 管理者のワークフローも、さっき作ったフロー一覧をみながら設定した。
-![](/article/images/redmine002.png)
+![](/images/redmine002.png)
 
 ### 開発者が持っているパラメーターの権限
 
-![](/article/images/redmine003.png)
+![](/images/redmine003.png)
 
 # やってみて思った事
 

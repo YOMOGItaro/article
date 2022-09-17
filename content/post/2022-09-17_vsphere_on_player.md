@@ -2,6 +2,8 @@
 title: "あまりお金をかけずにvSphereを試したい"
 date: 2022-09-17T13:19:54+09:00
 draft: true
+categories: [vmware]
+tags: [vmware,tech]
 ---
 
 あまりお金をかけずにvSphereを個人で試したい。ノートPC上で個人向けの無償ライセンスや評価版だけで環境を作る。VMware Workstationをインストールして、その上にnestedのvSphere環境を立てた。1時間くらいで試せる。

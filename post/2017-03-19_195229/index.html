@@ -1,0 +1,51 @@
+<!doctype html><html lang=ja><head><meta charset=utf-8><title>IPAM DCIM ツールの netbox を試してみる | よもぎさんのへや</title><meta name=viewport content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1"><link rel=stylesheet href=http://yomogitaro.github.io/article/css/sanitize.css><link rel=stylesheet href=http://yomogitaro.github.io/article/css/responsive.css><link rel=stylesheet href=/css/highlight_monokai.css><link rel=stylesheet/less href=http://yomogitaro.github.io/article/css/theme.less><link rel=stylesheet href=http://yomogitaro.github.io/article/css/custom.css><script src=http://yomogitaro.github.io/article/js/less.js type=text/javascript></script></head><body><div class=container><header role=banner><div class="row gutters"><div id=site-title class="col span_6"><h1><a href=http://yomogitaro.github.io/article/>よもぎさんのへや</a></h1><h2>たなからくさだいふく</h2></div><div id=social class="col span_6"><ul><li><a href=https://twitter.com/YOMOGItanpop target=_blank>Twitter</a></li><li><a href=https://github.com/yomogitaro target=_blank>GitHub</a></li></ul></div></div></header><main id=single role=main><div class=article-header><h1>IPAM DCIM ツールの netbox を試してみる</h1><div class=meta>Mar 19, 2017 &nbsp;</div></div><article><p>ちょっと前に<a href=https://netbox.readthedocs.io/en/latest/>netbox</a>というツールが良いと教えてもらったので試してみる。自分がためしたバージョンは v1.9.2。
+<a href=https://github.com/digitalocean/netbox>netbox</a> 自体は、 Django で書かれた Web アプリケーション。 <a href=https://github.com/digitalocean/go-netbox>go-netbox</a> という golang で書かれた API クライアントもある。</p><p>netbox のリポジトリに <code>docker-compose.yml</code> ファイルがあるのでこれを使ってたてていろいろ netbox と go-netbox を触ってみた。
+<a href=http://netbox.readthedocs.io/en/stable/installation/docker/>http://netbox.readthedocs.io/en/stable/installation/docker/</a></p><h1 id=web-ui-から一通りつかってみる>Web UI から一通りつかってみる</h1><p>ログインするとダッシュボード画面が出てくる。
+地域を管理する機能、DCIMとしての機能、IPAMとしての機能、エンドポイント間のリンクを管理する機能、パスワードなどの機密情報を管理する機能で分かれている。
+<img src=http://yomogitaro.github.io/article/images/netbox002.png alt></p><p>DCIM は使ったことがないので何ができると良いのかはよくわかっていない。
+機器の配置を決めてラック図を作ったり、
+製造元やシリアルナンバーなどの機器の情報を管理できるみたいだった。</p><p>IPAM としては、 VLAN やサブネット、IP が管理できた。
+Tenant や Site と紐付けることができたるので、目的の情報に到達しやすそう。
+Site は親子関係をつくって階層分けできたのも良かった。
+IP や VLAN などの登録は、 csv から一括登録するなどの方法が用意されていた。</p><p>管理者画面の <a href=https://netbox.readthedocs.io/en/stable/data-model/extras/>Extra</a> というところで、
+Custom Field の追加や、 Export Template の追加は試せた。
+Export Template で Custom Field を指定できなかったりしたけど一通り動いた。
+外部からグラフを表示する機能や、トポロジマップの機能もあるようだった。</p><h1 id=api-について>API について</h1><p><code>/api/docs/</code> などを見に行くと Swagger UI で API の一覧が見られる。
+<code>django-rest-swagger</code> で Swagger のドキュメントを生成しているみたいだった。
+基本的に GET の API しか用意されていないみたいだった。
+IPAM 系は GET の API しか存在しなかった。</p><h1 id=go-netbox-試してみる>go-netbox 試してみる</h1><p>golang の API クライアントの go-netbox を使ってみた。
+IP の一覧を取得するコードを適当に作った。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-go data-lang=go><span style=display:flex><span><span style=color:#f92672>package</span> <span style=color:#a6e22e>main</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#f92672>import</span> (
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;fmt&#34;</span>
+</span></span><span style=display:flex><span>    <span style=color:#e6db74>&#34;github.com/digitalocean/go-netbox&#34;</span>
+</span></span><span style=display:flex><span>)
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>func</span> <span style=color:#a6e22e>main</span>() {
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>c</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>netbox</span>.<span style=color:#a6e22e>NewClient</span>(<span style=color:#e6db74>&#34;http://localhost&#34;</span>, <span style=color:#66d9ef>nil</span>);
+</span></span><span style=display:flex><span>    <span style=color:#a6e22e>ips</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>c</span>.<span style=color:#a6e22e>IPAM</span>.<span style=color:#a6e22e>ListIPAddresses</span>(<span style=color:#66d9ef>nil</span>)
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>for</span> <span style=color:#a6e22e>_</span>, <span style=color:#a6e22e>ip</span> <span style=color:#f92672>:=</span> <span style=color:#66d9ef>range</span> <span style=color:#a6e22e>ips</span>{
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>marshaled</span>, <span style=color:#a6e22e>_</span> <span style=color:#f92672>:=</span> <span style=color:#a6e22e>ip</span>.<span style=color:#a6e22e>MarshalJSON</span>()
+</span></span><span style=display:flex><span>        <span style=color:#a6e22e>fmt</span>.<span style=color:#a6e22e>Println</span>(string(<span style=color:#a6e22e>marshaled</span>));
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>出力はこんな感じになる。</p><pre tabindex=0><code>{&#34;id&#34;:1,&#34;family&#34;:4,&#34;address&#34;:&#34;192.168.0.3/32&#34;,&#34;vrf&#34;:null,&#34;interface&#34;:null,&#34;description&#34;:&#34;&#34;,&#34;nat_inside&#34;:null,&#34;nat_outside&#34;:null}
+{&#34;id&#34;:2,&#34;family&#34;:4,&#34;address&#34;:&#34;192.168.0.4/32&#34;,&#34;vrf&#34;:null,&#34;interface&#34;:null,&#34;description&#34;:&#34;&#34;,&#34;nat_inside&#34;:null,&#34;nat_outside&#34;:null}
+{&#34;id&#34;:3,&#34;family&#34;:4,&#34;address&#34;:&#34;192.168.0.5/32&#34;,&#34;vrf&#34;:null,&#34;interface&#34;:null,&#34;description&#34;:&#34;&#34;,&#34;nat_inside&#34;:null,&#34;nat_outside&#34;:null}
+{&#34;id&#34;:4,&#34;family&#34;:4,&#34;address&#34;:&#34;192.168.0.13/32&#34;,&#34;vrf&#34;:null,&#34;interface&#34;:null,&#34;description&#34;:&#34;&#34;,&#34;nat_inside&#34;:null,&#34;nat_outside&#34;:null}
+{&#34;id&#34;:5,&#34;family&#34;:4,&#34;address&#34;:&#34;192.168.0.14/32&#34;,&#34;vrf&#34;:null,&#34;interface&#34;:null,&#34;description&#34;:&#34;&#34;,&#34;nat_inside&#34;:null,&#34;nat_outside&#34;:null}
+{&#34;id&#34;:6,&#34;family&#34;:4,&#34;address&#34;:&#34;192.168.0.15/32&#34;,&#34;vrf&#34;:null,&#34;interface&#34;:null,&#34;description&#34;:&#34;&#34;,&#34;nat_inside&#34;:null,&#34;nat_outside&#34;:null}
+</code></pre><h1 id=試している時にとったいろいろなキャプチャ>試している時にとったいろいろなキャプチャ</h1><h4 id=ipam-は-get-系の-api-しかなくて残念>IPAM は GET 系の API しかなくて残念</h4><p><img src=http://yomogitaro.github.io/article/images/netbox001.png alt="GET 系の API しかなくて残念の図"></p><h4 id=ラック図がみれる>ラック図がみれる</h4><p><img src=http://yomogitaro.github.io/article/images/netbox003.png alt></p><h3 id=ある-site-の-ip-を一つ取ろうと思った時の操作>ある Site の IP を一つ取ろうと思った時の操作</h3><h4 id=site-を選んで>Site を選んで、</h4><p><img src=http://yomogitaro.github.io/article/images/netbox004.png alt></p><h4 id=prefix-を選んで>Prefix を選んで、</h4><p><img src=http://yomogitaro.github.io/article/images/netbox005.png alt></p><h4 id=add-ip-を押して>Add IP を押して、</h4><p><img src=http://yomogitaro.github.io/article/images/netbox006.png alt></p><h4 id=ip-を取る>IP を取る</h4><p><img src=http://yomogitaro.github.io/article/images/netbox007.png alt></p><h4 id=追加する-ip-は複数同時に指定したりできる>追加する IP は、複数同時に指定したりできる</h4><p><img src=http://yomogitaro.github.io/article/images/netbox008.png alt></p><h4 id=csv-形式で大量に追加することもできる>csv 形式で大量に追加することもできる</h4><p><img src=http://yomogitaro.github.io/article/images/netbox009.png alt></p><h3 id=extra-を試した>Extra を試した</h3><h4 id=custom-field-追加>Custom Field 追加</h4><p><img src=http://yomogitaro.github.io/article/images/netbox010.png alt></p><h4 id=custom-field-ができた>Custom Field ができた</h4><p><img src=http://yomogitaro.github.io/article/images/netbox011.png alt></p><h4 id=export-template-追加>Export Template 追加</h4><p><img src=http://yomogitaro.github.io/article/images/netbox012.png alt></p><h4 id=export-template-出力>Export Template 出力</h4><pre tabindex=0><code>- address: 192.168.0.3/32
+  status: 2
+- address: 192.168.0.4/32
+  status: 2
+- address: 192.168.0.5/32
+  status: 2
+- address: 192.168.0.13/32
+  status: 2
+- address: 192.168.0.14/32
+  status: 2
+- address: 192.168.0.15/32
+  status: 2
+</code></pre></article><script type=text/javascript>var disqus_shortname="";(function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="//"+disqus_shortname+".disqus.com/embed.js",(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(e)})()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript rel=nofollow>comments powered by Disqus.</a></noscript></main><footer role=contentinfo><div style=text-align:center><img src="https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80" width=64 height=64><br>Written by YOMOGITARO</div></footer></div><script src=http://yomogitaro.github.io/article/js/highlight.pack.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

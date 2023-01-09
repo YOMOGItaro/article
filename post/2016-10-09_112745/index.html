@@ -1,0 +1,172 @@
+<!doctype html><html lang=ja><head><meta charset=utf-8><title>evm と Emacs 25.1 とモジュール | よもぎさんのへや</title><meta name=viewport content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1"><link rel=stylesheet href=http://yomogitaro.github.io/article/css/sanitize.css><link rel=stylesheet href=http://yomogitaro.github.io/article/css/responsive.css><link rel=stylesheet href=/css/highlight_monokai.css><link rel=stylesheet/less href=http://yomogitaro.github.io/article/css/theme.less><link rel=stylesheet href=http://yomogitaro.github.io/article/css/custom.css><script src=http://yomogitaro.github.io/article/js/less.js type=text/javascript></script></head><body><div class=container><header role=banner><div class="row gutters"><div id=site-title class="col span_6"><h1><a href=http://yomogitaro.github.io/article/>よもぎさんのへや</a></h1><h2>たなからくさだいふく</h2></div><div id=social class="col span_6"><ul><li><a href=https://twitter.com/YOMOGItanpop target=_blank>Twitter</a></li><li><a href=https://github.com/yomogitaro target=_blank>GitHub</a></li></ul></div></div></header><main id=single role=main><div class=article-header><h1>evm と Emacs 25.1 とモジュール</h1><div class=meta>Oct 9, 2016 &nbsp;</div></div><article><p>Emacs 25.1 から elisp 以外の言語で書かれたモジュールを読み込めるようになったらしい。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>Emacs can now load shared/dynamic libraries (modules). A dynamic Emacs module is a shared library that provides additional functionality for use in Emacs Lisp programs, just like a package written in Emacs Lisp would.
+</span></span></code></pre></div><p>試してみる、ついでに evm を試したりする。</p><p><code>--with-module</code> がないとモジュールが動かないところではまったりした。</p><h1 id=evm-で-emacs-251-を試す>evm で Emacs 25.1 を試す</h1><p>ひとつの環境に複数のバージョンの Emacs を管理できる evm というツールがあるらしい。
+いきなり 25.1 にするのは怖いので evm を入れてみる。</p><p><a href=https://github.com/rejeep/evm>https://github.com/rejeep/evm</a></p><p>readme の通り入れてみた。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>$ curl -fsSkL https://raw.github.com/rejeep/evm/master/go | bash
+</span></span><span style=display:flex><span>$ export PATH<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span>$HOME<span style=color:#e6db74>/.evm/bin:</span>$PATH<span style=color:#e6db74>&#34;</span>
+</span></span></code></pre></div><p>バージョンがあるか確認する。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>% evm list | grep 25.1
+</span></span><span style=display:flex><span>emacs-25.1
+</span></span><span style=display:flex><span>emacs-25.1-travis
+</span></span></code></pre></div><p>あった。</p><p>evm はデフォルトで <code>/usr/local/evm</code> にファイルを作るようだったので設定を変更。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>% evm config path ~/evm
+</span></span><span style=display:flex><span>% mkdir evm
+</span></span><span style=display:flex><span>% evm install emacs-25.1
+</span></span></code></pre></div><p>configure で失敗するらしい。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-text data-lang=text><span style=display:flex><span>checking for libXaw... configure: error: No X toolkit could be found.
+</span></span><span style=display:flex><span>If you are sure you want Emacs compiled without an X toolkit, pass
+</span></span><span style=display:flex><span>  --with-x-toolkit=no
+</span></span><span style=display:flex><span>to configure.  Otherwise, install the development libraries for the toolkit
+</span></span><span style=display:flex><span>that you want to use (e.g. Gtk+) and re-run configure.
+</span></span><span style=display:flex><span>Failed! See logs above for error.
+</span></span></code></pre></div><p>この先いろんなライブラリが不足していると言われそうなのでとりあえず、 依存パッケージを落としておく。
+これがいいわけではないとおもう。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>$ sudo apt-get build-dep emacs24
+</span></span></code></pre></div><p>うまくコンパイルできた。
+バイナリで着ている。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>$ evm bin emacs-25.1
+</span></span><span style=display:flex><span>/home/yourhome/evm/emacs-25.1/bin/emacs
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>$ evm use emacs-25.1
+</span></span></code></pre></div><p>Emacs が 25.1 で起動できるようになった。</p><h1 id=module-を動作させるところまで>module を動作させるところまで</h1><p>ここを参考にしてモジュールを作ってみる。
+<a href=http://diobla.info/blog-archive/modules-tut.html>http://diobla.info/blog-archive/modules-tut.html</a></p><p><code>emacs-module.h</code> を使うらしい。さっき evm に入って中に含まれるのでこれをつかう。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>$ cp /home/yourhome/evm/tmp/emacs-25.1/src/emacs-module.h ~/include/
+</span></span></code></pre></div><p>サンプルの <code>mymod.c</code> をコンパイルして <code>mymod.so</code> を作って、 <code>(require 'mymod)</code> したが下記のエラーがでて読み込まれなかった。</p><pre tabindex=0><code>Debugger entered--Lisp error: (file-error &#34;Cannot open load file&#34; &#34;そのようなファイルやディレクトリはありません&#34; &#34;mymod&#34;)
+</code></pre><p><code>.el</code>, <code>.elc</code> しか読まれないようになっていそうだった。
+よく見たら Emacs のコンパイルで <code>configure</code> の時に <code>--with-modules</code> が必要そうだ。</p><pre tabindex=0><code>--with-modules          compile with dynamic modules support
+</code></pre><p>evm でオプションを有効にしたレシピを作ってみた。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-diff data-lang=diff><span style=display:flex><span>% diff -u ~/.evm/recipes/{emacs-25.1,emacs-25.1-with-modules}.rb
+</span></span><span style=display:flex><span><span style=color:#f92672>--- /home/yomogi/.evm/recipes/emacs-25.1.rb     2016-10-09 15:14:06.824971490 +0900
+</span></span></span><span style=display:flex><span><span style=color:#f92672></span><span style=color:#a6e22e>+++ /home/yomogi/.evm/recipes/emacs-25.1-with-modules.rb        2016-10-10 10:46:54.497478153 +0900
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e></span><span style=color:#75715e>@@ -1,4 +1,4 @@
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#f92672>-recipe &#39;emacs-25.1&#39; do
+</span></span></span><span style=display:flex><span><span style=color:#f92672></span><span style=color:#a6e22e>+recipe &#39;emacs-25.1-with-modules&#39; do
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e></span>   tar_xz &#39;http://ftpmirror.gnu.org/emacs/emacs-25.1.tar.gz&#39;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>   osx do
+</span></span><span style=display:flex><span><span style=color:#75715e>@@ -12,6 +12,8 @@
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>     option &#39;--without-gif&#39;
+</span></span><span style=display:flex><span>   end
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>+  option &#39;--with-modules&#39;
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e>+
+</span></span></span><span style=display:flex><span><span style=color:#a6e22e></span>   install do
+</span></span><span style=display:flex><span>     configure
+</span></span><span style=display:flex><span>     make &#39;install&#39;
+</span></span></code></pre></div><p>ちゃんとたされたか確認してコンパイルして、設定。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>% evm list | grep emacs-25.1-with-modules
+</span></span><span style=display:flex><span>emacs-25.1-with-modules
+</span></span><span style=display:flex><span>% evm install emacs-25.1-with-modules
+</span></span><span style=display:flex><span>% evm use emacs-25.1-with-modules
+</span></span></code></pre></div><p>起動して動作確認</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>% emacs -Q -L path/to/module
+</span></span></code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-elisp data-lang=elisp><span style=display:flex><span>(require <span style=color:#e6db74>&#39;mymod</span>)
+</span></span><span style=display:flex><span>mymod
+</span></span><span style=display:flex><span>(mymod-test)
+</span></span><span style=display:flex><span><span style=color:#ae81ff>42</span>
+</span></span></code></pre></div><p>うまく行った。</p><h1 id=モジュールを作ってみる>モジュールを作ってみる</h1><p>サンプルは、固定値を表示するだけの関数だったので、引数を取るような plusone を作ってみる。モジュール名は tekito にする。
+どのような関数が用意されているかは <a href=https://github.com/emacs-mirror/emacs/blob/emacs-25/src/emacs-module.h>emacs-module.h</a>, <a href=https://github.com/emacs-mirror/emacs/blob/emacs-25/src/emacs-module.c>emacs-module.c</a> をみながら考えた。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c data-lang=c><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;emacs-module.h&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span> plugin_is_GPL_compatible;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#66d9ef>int</span> PLUSONE_MAX_ARGS_NUM <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#66d9ef>int</span> PLUSONE_MIN_ARGS_NUM <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span><span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> PLUSONE_DOC_STRING <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;doc&#34;</span>;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>static</span>
+</span></span><span style=display:flex><span>emacs_value
+</span></span><span style=display:flex><span><span style=color:#a6e22e>plusone</span>
+</span></span><span style=display:flex><span>(
+</span></span><span style=display:flex><span> emacs_env <span style=color:#f92672>*</span> env,
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>int</span> nargs,
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>const</span> emacs_value <span style=color:#66d9ef>const</span> args[],
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>void</span> <span style=color:#f92672>*</span> data
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>int</span> val;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  val <span style=color:#f92672>=</span> env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>extract_integer</span>(env, args[<span style=color:#ae81ff>0</span>]);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>make_integer</span> (env, val <span style=color:#f92672>+</span> <span style=color:#ae81ff>1</span>);
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// fset を呼び出して、 name で Sfun が呼ばれるようにする関数
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// (fset &#39;{{name}} Sfun) をする
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>fset</span>
+</span></span><span style=display:flex><span>(
+</span></span><span style=display:flex><span> emacs_env <span style=color:#f92672>*</span> env,
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> name,
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>const</span> emacs_value func_obj
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>int</span> FSET_ARGS_NUM <span style=color:#f92672>=</span> <span style=color:#ae81ff>2</span>;
+</span></span><span style=display:flex><span>  emacs_value func_name <span style=color:#f92672>=</span> env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>intern</span> (env, <span style=color:#e6db74>&#34;fset&#34;</span>);
+</span></span><span style=display:flex><span>  emacs_value func_args[] <span style=color:#f92672>=</span> { env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>intern</span> (env, name), func_obj };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>funcall</span>(
+</span></span><span style=display:flex><span>                env,
+</span></span><span style=display:flex><span>                func_name,
+</span></span><span style=display:flex><span>                FSET_ARGS_NUM,
+</span></span><span style=display:flex><span>                func_args
+</span></span><span style=display:flex><span>               );
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#75715e>// provide を呼び出す関数
+</span></span></span><span style=display:flex><span><span style=color:#75715e>// (provide &#39;{{feature}}) をする
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span><span style=color:#66d9ef>static</span> <span style=color:#66d9ef>void</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>provide</span>
+</span></span><span style=display:flex><span>(
+</span></span><span style=display:flex><span> emacs_env <span style=color:#f92672>*</span>env,
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>char</span> <span style=color:#f92672>*</span> <span style=color:#66d9ef>const</span> feature
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>static</span> <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>int</span> PROVIDE_ARGS_NUM <span style=color:#f92672>=</span> <span style=color:#ae81ff>1</span>;
+</span></span><span style=display:flex><span>  emacs_value func_name <span style=color:#f92672>=</span> env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>intern</span> (env, <span style=color:#e6db74>&#34;provide&#34;</span>);
+</span></span><span style=display:flex><span>  emacs_value func_args[] <span style=color:#f92672>=</span> { env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>intern</span> (env, feature) };
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>funcall</span> (
+</span></span><span style=display:flex><span>                env,
+</span></span><span style=display:flex><span>                func_name,
+</span></span><span style=display:flex><span>                PROVIDE_ARGS_NUM,
+</span></span><span style=display:flex><span>                func_args
+</span></span><span style=display:flex><span>                );
+</span></span><span style=display:flex><span>}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>int</span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>emacs_module_init</span>
+</span></span><span style=display:flex><span>(
+</span></span><span style=display:flex><span> <span style=color:#66d9ef>struct</span> emacs_runtime <span style=color:#f92672>*</span>ert
+</span></span><span style=display:flex><span> )
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>  emacs_env <span style=color:#f92672>*</span> env <span style=color:#f92672>=</span> ert<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>get_environment</span> (ert);
+</span></span><span style=display:flex><span>  emacs_value fun <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>    env<span style=color:#f92672>-&gt;</span><span style=color:#a6e22e>make_function</span>(
+</span></span><span style=display:flex><span>                       env,
+</span></span><span style=display:flex><span>                       PLUSONE_MIN_ARGS_NUM,
+</span></span><span style=display:flex><span>                       PLUSONE_MAX_ARGS_NUM,
+</span></span><span style=display:flex><span>                       (<span style=color:#a6e22e>emacs_value</span> (<span style=color:#f92672>*</span>)())plusone,
+</span></span><span style=display:flex><span>                       PLUSONE_DOC_STRING,
+</span></span><span style=display:flex><span>                       NULL <span style=color:#75715e>// よくわかっていない
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>  );
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>fset</span>(env, <span style=color:#e6db74>&#34;plusone&#34;</span>, fun);
+</span></span><span style=display:flex><span>  <span style=color:#a6e22e>provide</span> (env, <span style=color:#e6db74>&#34;tekito&#34;</span>);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>  <span style=color:#66d9ef>return</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Makefile はこんな感じ</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-makefile data-lang=makefile><span style=display:flex><span>LIBRARY    <span style=color:#f92672>=</span> <span style=color:#66d9ef>$(</span>HOME<span style=color:#66d9ef>)</span>/include
+</span></span><span style=display:flex><span>CC      <span style=color:#f92672>=</span> gcc
+</span></span><span style=display:flex><span>LD      <span style=color:#f92672>=</span> gcc
+</span></span><span style=display:flex><span>CFLAGS  <span style=color:#f92672>=</span> -ggdb3 -Wall
+</span></span><span style=display:flex><span>LDFLAGS <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>all</span><span style=color:#f92672>:</span> tekito.so
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>%.so</span><span style=color:#f92672>:</span> %.o
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>$(</span>LD<span style=color:#66d9ef>)</span> -shared <span style=color:#66d9ef>$(</span>LDFLAGS<span style=color:#66d9ef>)</span> -o $@ $&lt;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span><span style=color:#a6e22e>%.o</span><span style=color:#f92672>:</span> %.c
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>$(</span>CC<span style=color:#66d9ef>)</span> <span style=color:#66d9ef>$(</span>CFLAGS<span style=color:#66d9ef>)</span> -I<span style=color:#66d9ef>$(</span>LIBRARY<span style=color:#66d9ef>)</span> -fPIC -c $&lt;
+</span></span></code></pre></div><p>Emacs で動作を試してみた。うまく動いた。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=display:flex><span>emacs -Q -L <span style=color:#e6db74>&#34;</span><span style=color:#e6db74>${</span>HOME<span style=color:#e6db74>}</span><span style=color:#e6db74>/Programs/sandbox/20161010/&#34;</span>
+</span></span></code></pre></div><p>scratch バッファでいろいろ。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-md data-lang=md><span style=display:flex><span>(require &#39;tekito)
+</span></span><span style=display:flex><span>tekito
+</span></span><span style=display:flex><span>(plusone 15)
+</span></span><span style=display:flex><span>16
+</span></span><span style=display:flex><span>(require &#39;tekito)
+</span></span><span style=display:flex><span>tekito
+</span></span><span style=display:flex><span>(plusone 5)
+</span></span><span style=display:flex><span>6
+</span></span><span style=display:flex><span>(plusone -2000)
+</span></span><span style=display:flex><span>-1999
+</span></span></code></pre></div><h1 id=まとめ>まとめ</h1><ul><li>Emacs 25.1 でモジュールを使うときには、 Emacs をビルドするときに <code>--with-modules</code> のオプションがいる。</li><li>C と C++ 以外で使えるのかはよくわからなかった。</li></ul><h1 id=その他>その他</h1><ul><li>英語を読むとき昔使っていた firefox のがうまく動かないので、結局 chrome の weblio プラグインにした。</li></ul></article><script type=text/javascript>var disqus_shortname="";(function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="//"+disqus_shortname+".disqus.com/embed.js",(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(e)})()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript rel=nofollow>comments powered by Disqus.</a></noscript></main><footer role=contentinfo><div style=text-align:center><img src="https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80" width=64 height=64><br>Written by YOMOGITARO</div></footer></div><script src=http://yomogitaro.github.io/article/js/highlight.pack.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

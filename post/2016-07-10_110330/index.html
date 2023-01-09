@@ -1,0 +1,193 @@
+<!doctype html><html lang=ja><head><meta charset=utf-8><title>elasticsearch 5.0.0-alpha4 + IPv6 + Packetbeats で遊びたい | よもぎさんのへや</title><meta name=viewport content="width=device-width,user-scalable=no,maximum-scale=1,initial-scale=1"><link rel=stylesheet href=http://yomogitaro.github.io/article/css/sanitize.css><link rel=stylesheet href=http://yomogitaro.github.io/article/css/responsive.css><link rel=stylesheet href=/css/highlight_monokai.css><link rel=stylesheet/less href=http://yomogitaro.github.io/article/css/theme.less><link rel=stylesheet href=http://yomogitaro.github.io/article/css/custom.css><script src=http://yomogitaro.github.io/article/js/less.js type=text/javascript></script></head><body><div class=container><header role=banner><div class="row gutters"><div id=site-title class="col span_6"><h1><a href=http://yomogitaro.github.io/article/>よもぎさんのへや</a></h1><h2>たなからくさだいふく</h2></div><div id=social class="col span_6"><ul><li><a href=https://twitter.com/YOMOGItanpop target=_blank>Twitter</a></li><li><a href=https://github.com/yomogitaro target=_blank>GitHub</a></li></ul></div></div></header><main id=single role=main><div class=article-header><h1>elasticsearch 5.0.0-alpha4 + IPv6 + Packetbeats で遊びたい</h1><div class=meta>Jul 10, 2016 &nbsp;</div></div><article><p>elasticsearch 5.0.0-alpha4 をみると datatype に IPv6 を含む IP 型ができている
+<a href=https://www.elastic.co/guide/en/elasticsearch/reference/master/ip.html>https://www.elastic.co/guide/en/elasticsearch/reference/master/ip.html</a></p><pre tabindex=0><code>An ip field can index/store either IPv4 or IPv6 addresses.
+</code></pre><p>試してみたい。
+IPv6 もよく知らないので、ちょっと触ってみたい。せっかくなので Packetbeats も試してみたい。</p><p>やってみたら、 IPv6 を使うときは ip 型の stored を有効にしたほうが良さそうということがわかった。</p><h2 id=elasticsearch--kibana>Elasticsearch + kibana</h2><p>とりあえず環境をつくる。</p><pre tabindex=0><code>% docker pull elasticsearch:5.0.0-alpha4
+% docker run -d --name es2 elasticsearch:5.0.0-alpha4
+</code></pre><p>メモリ確保できないといわれた</p><pre tabindex=0><code>{&#34;log&#34;:&#34;Exception in thread \&#34;main\&#34; java.lang.RuntimeException: bootstrap checks failed\n&#34;,&#34;stream&#34;:&#34;stderr&#34;,&#34;time&#34;:&#34;2016-07-10T06:56:11.405356902Z&#34;}
+{&#34;log&#34;:&#34;initial heap size [268435456] not equal to maximum heap size [2147483648]; this can cause resize pauses and prevents mlockall from locking the entire heap\n&#34;,&#34;stream&#34;:&#34;stderr&#34;,&#34;time&#34;:&#34;2016-07-10T06:56:11.405443037Z&#34;}
+</code></pre><p><a href=https://discuss.elastic.co/t/initial-heap-size-not-equal-to-maximum-heap-size/50499>https://discuss.elastic.co/t/initial-heap-size-not-equal-to-maximum-heap-size/50499</a> を参考にして
+<code>ES_HEAP_SIZE</code> を変更しようとしたら、 <code>ES_JAVA_OPTS</code> を編集してと言われた。</p><pre tabindex=0><code>% docker run -it --rm -e ES_HEAP_SIZE=&#39;256m&#39;  --name  es03  elasticsearch:5.0.0-alpha4
+Error: encountered environment variables that are no longer supported
+Use jvm.options or ES_JAVA_OPTS to configure the JVM
+ES_HEAP_SIZE=256m: set -Xms256m and -Xmx256m in jvm.options or add &#34;-Xms256m -Xmx256m&#34; to ES_JAVA_OPTS
+</code></pre><p>また、おこられた</p><pre tabindex=0><code>% docker run -it --rm -e ES_JAVA_OPTS=&#39;-256m -256m&#39;  --name  es03  elasticsearch:5.0.0-alpha4
+max virtual memory areas vm.max_map_count [65530] likely too low, increase to at least [262144]
+</code></pre><p><code>vm.max_map_count</code> はプロセスが利用可能なメモリマップの最大値らしい。
+少なくとも 262144 にして欲しいそうなので変える。
+sysctl で書き換える。</p><pre tabindex=0><code>sudo sysctl -w vm.max_map_count=262144
+</code></pre><p>無事立ち上がった。</p><pre tabindex=0><code>docker run -it --rm -e ES_JAVA_OPTS=&#39;-Xms256m -Xmx256m&#39;  --name  es03  elasticsearch:5.0.0-alpha4
+</code></pre><p>kibana も新しいのにしてみた。</p><pre tabindex=0><code>docker run -it --rm --link es03:elasticsearch --name kibana02 kibana:5.0.0-alpha4
+</code></pre><p>kibana 開いてみたら自分が見慣れていた色と違う色使いの画面が出てきて戸惑った。
+<img src=http://yomogitaro.github.io/article/images/kibana001.png alt></p><p>Upload CSV とか書いてあった。 1GB までの CSV ならアップロードできるみたい。
+<img src=http://yomogitaro.github.io/article/images/kibana002.png alt></p><p>気になったので少し脱線してやってみた。
+統計庁から適当な csv 持ってきていれてみた。
+<a href="http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&cycode=0">http://www.e-stat.go.jp/SG1/estat/List.do?bid=000001033705&cycode=0</a></p><p><img src=http://yomogitaro.github.io/article/images/kibana003.png alt></p><p>先頭行がフィールド名として扱われた。デリミタはタブ、スペース、セミコロン、パイプも指定できる。
+適当に整形した。</p><p><img src=http://yomogitaro.github.io/article/images/kibana004.png alt></p><p>各フィールドの型は決められるみたいだった。
+事前に時間を表すフィールドは date 型に変換できるように整形したほうが良さそうだった。
+今回は <code>199901</code> を <code>1999-01</code> に事前に修正すればよかった。
+インデックス名もここで決められた。</p><p><img src=http://yomogitaro.github.io/article/images/kibana005.png alt></p><p>無事アップロードできた。
+<img src=http://yomogitaro.github.io/article/images/kibana006.png alt></p><p>飲み物の消費者物価指数推移とかが作れた。
+<img src=http://yomogitaro.github.io/article/images/kibana007.png alt>
+どうでも良いことだが、物価指数は基準の月を 100 とした時の、
+比較を表しているものらしかった。</p><h2 id=packetbeats>packetbeats</h2><p>まずはダッシュボードの準備。
+<a href=https://github.com/elastic/beats-dashboards>https://github.com/elastic/beats-dashboards</a>
+指定する IP は ES の IP なので注意。</p><pre tabindex=0><code>% ./load.sh -url &#34;http://172.17.0.2:9200&#34;
+</code></pre><p>いくつか kibana のダッシュボードが増える。
+web と db については、詳細に見られそうだった。</p><p>packetbeats そのものをインストールする。ここにしたがってインストールした。
+<a href=https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation.html>https://www.elastic.co/guide/en/beats/packetbeat/current/packetbeat-installation.html</a></p><p>ES にテンプレートを適用した。</p><pre tabindex=0><code>% curl -XPUT &#39;http://172.17.0.2:9200/_template/packetbeat&#39; -d@packetbeat.template.json
+</code></pre><p><code>packetbeat.yml</code> が必要らしいので書く。インデックス名は packetbeat にしないと、
+多分テンプレートと、ダッシュボードがうまく使えない。</p><pre tabindex=0><code>hosts: [&#34;172.17.0.2:9200&#34;]
+index: &#34;packetbeat&#34;
+template:
+  path: &#34;packetbeat.template.json&#34;
+</code></pre><p>コンフィグテストして実行した。</p><pre tabindex=0><code>% sudo packetbeat -configtest -e ./
+% sudo packetbeat
+</code></pre><p>es にちゃんと溜まった。</p><h2 id=es-に残っている結果をみてみた>ES に残っている結果をみてみた</h2><p>kibana からドキュメントを見たところ、 ip のフィールドの type が string になっていた。
+v1.2 を入れていたが packetbeats 用のテンプレートで特に指定されていないのでそうなっている。
+<a href=https://github.com/elastic/beats/blob/1.2/packetbeat/etc/packetbeat.template.json>https://github.com/elastic/beats/blob/1.2/packetbeat/etc/packetbeat.template.json</a></p><p>master ブランチをみたら <code>keyword</code> となっていた。 <code>ip</code> ではないので、やろうと思っていたことができない。
+<a href=https://github.com/elastic/beats/blob/master/packetbeat/packetbeat.template.json#L910-L913>https://github.com/elastic/beats/blob/master/packetbeat/packetbeat.template.json#L910-L913</a>
+よくよく考えたら現行バージョンの ip 型は IPv6 に対応していないので、この型になっているのは正しい。</p><p>試してみたいので IP が入るところを ip に適当に変換して適用してみた。
+ingest API でも設定できそうだが、 beats で送信するときにうまく設定する方法がわからなかったので、やらなかった。</p><pre tabindex=0><code>% curl -XPUT &#39;http://172.17.0.2:9200/_template/packetbeat&#39; -d@packetbeat-iptest.template.json
+% curl -XDELETE &#39;http://172.17.0.2:9200/packetbeat-*&#39;
+% sudo packetbeat
+</code></pre><h2 id=ip-型を使うと良い所-ipv4>ip 型を使うと良い所 IPv4</h2><p>IPv4 では range の検索はできる。</p><pre tabindex=0><code>POST packetbeat-*/_search
+{
+  &#34;query&#34;: {
+    &#34;range&#34;: {
+      &#34;client_ip&#34;: {
+        &#34;from&#34;: &#34;127.0.0.1&#34;,
+        &#34;to&#34;: &#34;127.255.255.255&#34;
+      }
+    }
+  }
+}
+</code></pre><p>IPv4 で CIDR の検索もできる(v2.2.0 以降らしい)。</p><pre tabindex=0><code>POST packetbeat-*/_search
+{
+  &#34;query&#34;: {
+    &#34;term&#34;: {
+      &#34;client_ip&#34;: &#34;127.0.0.0/8&#34;
+    }
+  }
+}
+</code></pre><h2 id=ipv6-を入れた時のこと>IPv6 を入れた時のこと</h2><p>packetbeats からやるのが面倒になったので試しにデータを入れてみる。</p><pre tabindex=0><code>curl -XPOST http://172.17.0.2:9200/iptest -d &#39;{
+    &#34;mappings&#34; : {
+        &#34;testtype&#34; : {
+            &#34;properties&#34; : {
+                &#34;ip&#34; : { &#34;type&#34; : &#34;ip&#34; }
+            }
+        }
+    }
+}&#39;
+</code></pre><p>入れた順番でソートしたいので作成時間のフィールドを追加。 <code>_datetime</code> は5系ではなくなって、
+ingest API で設定するようになったらしい。
+<a href=https://www.elastic.co/guide/en/elasticsearch/reference/master/accessing-data-in-pipelines.html#accessing-ingest-metadata>https://www.elastic.co/guide/en/elasticsearch/reference/master/accessing-data-in-pipelines.html#accessing-ingest-metadata</a>
+現在のところ mapping とかで pipeline は指定できないので、ドキュメント作成時に指定するか、 reindex しないといけないらしい。</p><pre tabindex=0><code>curl -XPUT &#39;http://172.17.0.2:9200/_ingest/pipeline/add-received-pipeline&#39; -d&#39;{
+  &#34;description&#34;: &#34;add received time&#34;,
+  &#34;processors&#34;: [
+    {
+      &#34;set&#34;: {
+        &#34;field&#34;: &#34;received&#34;,
+        &#34;value&#34;: &#34;{{ _ingest.timestamp }}&#34;
+      }
+    }
+  ]
+}&#39;
+</code></pre><p>入れるデータは <a href=http://www.ietf.org/rfc/rfc5952.txt>http://www.ietf.org/rfc/rfc5952.txt</a> を参考にした。</p><pre tabindex=0><code>curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd::1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:0:1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:0:0:0::1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:0:0::1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:0::1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8::1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8::aaaa:0:0:1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:0:0:aaaa::1&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:aaaa&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AAAA&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AaAa&#34; }&#39;
+curl -XPOST &#39;http://172.17.0.2:9200/iptest/testtype/?pipeline=add-received-pipeline&#39; -d &#39;{ &#34;ip&#34; : &#34;::0&#34; }&#39;
+</code></pre><p>中に入っているデータは、同じ IP でも入れた時と同じ形式で入っていた。</p><pre tabindex=0><code>% curl -s -XPOST http://172.17.0.2:9200/iptest/_search -d&#39;{ &#34;size&#34;: 100, &#34;sort&#34;: &#34;received&#34; }&#39; | jq &#34;.hits.hits[]._source.ip&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd::1&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:0:1&#34;
+&#34;2001:db8:0:0:0::1&#34;
+&#34;2001:db8:0:0::1&#34;
+&#34;2001:db8:0::1&#34;
+&#34;2001:db8::1&#34;
+&#34;2001:db8::aaaa:0:0:1&#34;
+&#34;2001:db8:0:0:aaaa::1&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:aaaa&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AAAA&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:AaAa&#34;
+</code></pre><p>検索してみた。表記方法が異なってもちゃんと検索されていた。</p><pre tabindex=0><code>curl -s -XPOST http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &#34;query&#34;: {
+    &#34;term&#34;: {
+      &#34;ip&#34;: &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+    }
+  }
+}
+&#39; | jq &#34;.hits.hits[]._source.ip&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&#34;
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;
+</code></pre><p>中に入っている情報は 128bit なはずなので調べる。
+(補足)5 系から field -> stored_field, fielddata_field -> docvalue_field に変更されているようだが、
+alpha4 の時点では、<a href=https://github.com/elastic/elasticsearch/commit/eb1e231a635a124f445364e4baabaf1c297399ff>一度元に戻されていたた</a>め、 fielddata_fields を指定しないと動かなかった。5系リリース時点では、 docvalue_field 指定が正しくなっていそう。</p><pre tabindex=0><code>% curl -s -XGET http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &#34;query&#34;: {
+    &#34;term&#34;: {
+      &#34;ip&#34;: &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+    }
+  },
+  &#34;fielddata_fields&#34; : [&#34;ip&#34;]
+}
+&#39; | jq &#34;.hits.hits[] | .fields.ip[0], ._source.ip&#34; | paste -d, - -
+</code></pre><p>フィールドとして変換された結果は同じものとして、入っているみたいだった。
+フィールドのほうは読めない。</p><pre tabindex=0><code>&#34; \u0001\r¸ªª»»̌ݝ\u0001&#34;,&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:01&#34;
+&#34; \u0001\r¸ªª»»̌ݝ\u0001&#34;,&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;
+&#34; \u0001\r¸ªª»»̌ݝ\u0001&#34;,&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:001&#34;
+&#34; \u0001\r¸ªª»»̌ݝ\u0001&#34;,&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+</code></pre><p>入っている内容はよくわからないし、バイト数も多い。</p><pre tabindex=0><code>% curl -s -XGET http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &#34;query&#34;: {
+    &#34;term&#34;: {
+      &#34;ip&#34;: &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+    }
+  },
+  &#34;fielddata_fields&#34; : [&#34;ip&#34;]
+}
+&#39; | jq -r &#34;.hits.hits[0] | .fields.ip[0]&#34; | hexdump -C -s 1
+00000001  01 0d c2 b8 c2 aa c2 aa  c2 bb c2 bb cc 8c dd 9d  |................|
+00000011  ee ae 80 01 0a                                    |.....|
+00000016
+</code></pre><p>いろいろ調べてたら doc_value として持っていたら良さそうだった。
+<a href=https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/search/DocValueFormat.java#L296>https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/search/DocValueFormat.java#L296</a></p><p>ip を stored にしてみた。</p><pre tabindex=0><code>curl -XPOST http://172.17.0.2:9200/iptest -d &#39;{
+    &#34;mappings&#34; : {
+        &#34;testtype&#34; : {
+            &#34;properties&#34; : {
+                &#34;ip&#34; : { &#34;type&#34; : &#34;ip&#34;, &#34;stored&#34;: true }
+            }
+        }
+    }
+}&#39;
+</code></pre><p>検索してみる。</p><pre tabindex=0><code>curl -s -XGET http://172.17.0.2:9200/iptest/_search -d&#39;{
+  &#34;query&#34;: {
+    &#34;term&#34;: {
+      &#34;ip&#34;: &#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:0001&#34;
+    }
+  },
+  &#34;fields&#34; : [&#34;ip&#34;]
+}
+&#39; | jq &#34;.hits.hits[] | .fields.ip[0], ._source.ip&#34; | paste -d, - -
+</code></pre><p>ちゃんと見える状態で入ってきた。
+stored にすると source を変換した値が入ることがあるようだった。知らなかった。</p><pre tabindex=0><code>&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;,null
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;,null
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;,null
+&#34;2001:db8:aaaa:bbbb:cccc:dddd:eeee:1&#34;,null
+</code></pre><p>kibana でも統一されたフォーマットで表示されるようになった。
+<img src=http://yomogitaro.github.io/article/images/kibana008.png alt></p><h2 id=感想>感想</h2><ul><li>ip 型を使って、 IPv6 の検索結果のフォーマットを統一したいときは、 stored を true にしたほうが良い。</li><li>ingests API の pipeline をデフォルトで通すようにしたいけど、 mapping とかで設定できないのでどう設定すればいいかわからなかった</li><li>test-kitchen を途中で見かけたけど便利そうだった</li></ul><h2 id=みたところ>みたところ</h2><ul><li><a href=https://docs.oracle.com/javase/jp/6/api/java/net/Inet6Address.html>https://docs.oracle.com/javase/jp/6/api/java/net/Inet6Address.html</a></li><li><a href=https://github.com/apache/lucene-solr/blob/91fd163112b9a433d3e1f578d5c8a9cfbd9dce2f/lucene/sandbox/src/java/org/apache/lucene/document/InetAddressPoint.java>https://github.com/apache/lucene-solr/blob/91fd163112b9a433d3e1f578d5c8a9cfbd9dce2f/lucene/sandbox/src/java/org/apache/lucene/document/InetAddressPoint.java</a></li><li><a href=https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/index/mapper/ip/IpFieldMapper.java>https://github.com/elastic/elasticsearch/blob/master/core/src/main/java/org/elasticsearch/index/mapper/ip/IpFieldMapper.java</a></li></ul></article><script type=text/javascript>var disqus_shortname="";(function(){var e=document.createElement("script");e.type="text/javascript",e.async=!0,e.src="//"+disqus_shortname+".disqus.com/embed.js",(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(e)})()</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript rel=nofollow>comments powered by Disqus.</a></noscript></main><footer role=contentinfo><div style=text-align:center><img src="https://s.gravatar.com/avatar/4d1410a9d92bd52625d4de8a51c389b7?s=80" width=64 height=64><br>Written by YOMOGITARO</div></footer></div><script src=http://yomogitaro.github.io/article/js/highlight.pack.js></script>
+<script>hljs.initHighlightingOnLoad()</script></body></html>

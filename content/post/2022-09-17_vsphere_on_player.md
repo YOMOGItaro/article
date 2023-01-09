@@ -1,12 +1,12 @@
 ---
-title: "あまりお金をかけずにvSphereを試したい"
+title: "おうちのノートPCでvSphereを試したい"
 date: 2022-09-17T13:19:54+09:00
 draft: true
 categories: [vmware]
 tags: [vmware,tech,study]
 ---
 
-あまりお金をかけずにvSphereを個人で試したい。ノートPC上で個人向けの無償ライセンスや評価版だけで環境を作る。VMware Workstationをインストールして、その上にnestedのvSphere環境を立てた。1時間くらいで試せる。
+おうちのノートPCでお手軽にvSphereを試したい。ノートPC上で個人向けの無償ライセンスや評価版だけで環境を作る。VMware Workstationをインストールして、その上にnestedのvSphere環境を立てた。1時間くらいで試せる。
 
 ## 環境
 
@@ -49,7 +49,6 @@ https://docs.vmware.com/jp/VMware-vSphere/7.0/com.vmware.esxi.install.doc/GUID-D
 VMが起動してインストールの読み込み画面になるので入力できるようになるまで2分くらい待った。
 インストール先ディスク(ローカルの32GBへ)、キーボードレイアウト(Japaneseに)、パスワードなど聞かれるので入力する。
 すべてが終わると再起動する。2分くらいで起動した。
-ネットワークがデフォルトで「NAT」になっているが、一度シャットダウンし、仮想マシン設定の編集からネットワークアダプタ設定を「ホストオンリー」にした。
 
 こちらを使うとOVAデプロイのみで済みそうなので、楽かもしれない  
 https://williamlam.com/nested-virtualization/nested-esxi-virtual-appliance
@@ -74,9 +73,6 @@ https://williamlam.com/2020/03/homelab-considerations-for-vsphere-7.html
 
 Networking ConfigurationはDHCPで配布されるのでスキップ。
 SSO Configuration, System Configuration のパスワード設定は入れないといけないので入れておく。
-
-1分くらいでデプロイされる。
-ネットワークがデフォルトで「ブリッジ」になっているので、「ホストオンリー」に変更する。
 
 それから1分くらいで「Welcome to Photon」と書かれたログイン画面が出たり青い画面がでたりするが何もしないで2分ほど待つと黒い画面に「VMware vCenter Server」と書かれたものが出るのでそこで起動完了。
 アドレスがDHCPで振られているので https://192.168.154.130:5480/ にアクセスすると、まだ何かしている1分くらい待った。
@@ -105,3 +101,4 @@ VMware Workstation Player が起動していると次に進まないので閉じ
 
 VMware Playerのアップデートが完了後、再度起動してみた。
 VMはしっかり残っていた。
+

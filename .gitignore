@@ -2,3 +2,4 @@ public
 *~
 /.python-version
 *.mp4:Zone.Identifier
+.vscode/launch.json

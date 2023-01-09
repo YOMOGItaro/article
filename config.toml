@@ -3,6 +3,7 @@ canonifyurls=true
 languageCode = "ja"
 title = "よもぎさんのへや"
 pygmentscodefences = true
+theme = "angels-ladder"
 
 [Params]
 subtitle = "たなからくさだいふく"
